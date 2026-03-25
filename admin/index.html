@@ -88,7 +88,7 @@
                     <tr>
                         <th>Date</th>
                         <th>Case ID</th>
-                        <th>Password</th>
+                        <th>CNIC</th>
                         <th>Patient Name</th>
                         <th>Status</th>
                         <th>Actions</th>
@@ -126,7 +126,7 @@
             <p style="margin-bottom: 20px; color: var(--text-muted);">Enter patient details and upload the report file (PDF, DOCX, Image).</p>
             <form id="reportForm" style="background: white; padding: 30px; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; box-shadow: var(--shadow-sm);">
                 <div class="form-group"><label>Case Number (e.g. 12345)</label><input type="text" id="repCaseId" required></div>
-                <div class="form-group"><label>Patient Password(e.g. 1234567)</label><input type="text" id="repCnic" required></div>
+                <div class="form-group"><label>Patient CNIC (e.g. 31202-0000000-0)</label><input type="text" id="repCnic" required></div>
                 <div class="form-group"><label>Patient Name</label><input type="text" id="repName" required></div>
                 <div class="form-group"><label>Patient Phone Number</label><input type="tel" id="repPhone" required placeholder="e.g. 03136811565"></div>
                 
@@ -141,6 +141,24 @@
                     <button type="submit" class="btn btn-primary" style="width: 250px;"><i class="fas fa-file-export"></i> Upload & Publish Report</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Success Modal for WhatsApp -->
+    <div id="waSuccessModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:white; padding:40px; border-radius:20px; text-align:center; max-width:450px; width:90%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+            <div style="background:#dcfce7; width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px;">
+                <i class="fas fa-check-circle" style="font-size:3rem; color:#059669;"></i>
+            </div>
+            <h2 style="color:var(--primary); margin-bottom:15px; font-size:1.8rem;">Report Published!</h2>
+            <p style="margin-bottom:30px; color:#4b5563; line-height:1.6;">The laboratory report has been successfully uploaded and published to the patient portal. You can now send the access credentials to the patient via WhatsApp.</p>
+            
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <a id="waFinalBtn" href="#" target="_blank" class="btn btn-secondary" style="height:60px; font-size:1.1rem; display:flex; align-items:center; justify-content:center; text-decoration:none;">
+                    <i class="fab fa-whatsapp" style="margin-right:10px; font-size:1.4rem;"></i> Send Credentials to Patient
+                </a>
+                <button onclick="closeSuccessModal()" class="btn" style="background:#f3f4f6; color:#4b5563; height:50px;">Return to Dashboard</button>
+            </div>
         </div>
     </div>
 
@@ -241,6 +259,11 @@
             document.getElementById('filterDate').value = '';
             document.getElementById('filterMonth').value = '';
             loadReports();
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('waSuccessModal').style.display = 'none';
+            switchTab('issuedReports', document.querySelectorAll('.tab-btn')[0]);
         }
 
         async function loadReports() {
@@ -396,22 +419,22 @@
                     if(phone.startsWith('0')) phone = '92' + phone.substring(1);
                     if(!phone.startsWith('92')) phone = '92' + phone;
 
-                    const liveLink = `${window.location.origin}/report.html?case_id=${formData.get('case_id')}&cnic=${formData.get('cnic')}`;
-
-                    const waText = encodeURIComponent(`Assalam-o-Alaikum! Your lab report at Al-Rasheed Center is ready.
-                    Case ID: ${formData.get('case_id')} 
-                    CNIC: ${formData.get('cnic')}
-                    View Online: ${livelink}`
-                    );
-
+                    const patientName = formData.get('patient_name').trim();
+                    const caseId = formData.get('case_id').trim();
+                    const password = formData.get('cnic').trim();
+                    
+                    const waText = encodeURIComponent(`Assalam-o-Alaikum ${patientName}! Your official lab report at Al-Rasheed Diagnostic Center is ready.\n\nCase ID: ${caseId}\nPassword: ${password}\n\nView Online: www.rdcpk.com`);
                     const waLink = `https://wa.me/${phone}?text=${waText}`;
                     
-                    if(confirm("Report Uploaded Successfully! \n\nClick OK to open WhatsApp and send credentials.")) {
-                        window.open(waLink, '_blank');
-                    }
+                    // Show custom success modal for reliable redirection
+                    const modal = document.getElementById('waSuccessModal');
+                    const btnFinal = document.getElementById('waFinalBtn');
+                    btnFinal.href = waLink;
+                    modal.style.display = 'flex';
+                    
+                    // Cleanup form
                     e.target.reset();
                     loadReports();
-                    switchTab('issuedReports', document.querySelectorAll('.tab-btn')[0]);
                 } else {
                     const errorData = await res.json();
                     alert("Issue: " + (errorData.error || "Server error"));
