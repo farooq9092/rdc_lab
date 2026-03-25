@@ -189,14 +189,14 @@ document.body.insertAdjacentHTML('beforeend', portalModalHTML);
 
 const modal = document.getElementById('portalModal');
 const closeBtn = modal.querySelector('.close-modal');
-const viewReportsBtn = document.querySelector('.btn-primary[href="#"]');
+const viewReportsBtns = document.querySelectorAll('.btn-primary[href="#"]');
 
-if (viewReportsBtn) {
-    viewReportsBtn.addEventListener('click', (e) => {
+viewReportsBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
         e.preventDefault();
         modal.style.display = 'flex';
     });
-}
+});
 
 if (closeBtn) {
     closeBtn.addEventListener('click', () => {
