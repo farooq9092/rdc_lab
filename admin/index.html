@@ -396,8 +396,14 @@
                     if(phone.startsWith('0')) phone = '92' + phone.substring(1);
                     if(!phone.startsWith('92')) phone = '92' + phone;
 
-                    const liveLink = window.location.origin;
-                    const waText = encodeURIComponent(`Assalam-o-Alaikum! Your lab report at Al-Rasheed Center is ready.\n\nCase ID: ${formData.get('case_id')}\nCNIC: ${formData.get('cnic')}\n\nView Online: ${liveLink}`);
+                    const liveLink = `${window.location.origin}/report.html?case_id=${formData.get('case_id')}&cnic=${formData.get('cnic')}`;
+
+                    const waText = encodeURIComponent(`Assalam-o-Alaikum! Your lab report at Al-Rasheed Center is ready.
+                    Case ID: ${formData.get('case_id')} 
+                    CNIC: ${formData.get('cnic')}
+                    View Online: ${liveLink}`
+                    );
+
                     const waLink = `https://wa.me/${phone}?text=${waText}`;
                     
                     if(confirm("Report Uploaded Successfully! \n\nClick OK to open WhatsApp and send credentials.")) {
