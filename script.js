@@ -14,16 +14,13 @@ window.addEventListener('scroll', () => {
     }
 });
 
-  // Sticky header scroll effect
-  // Note: The 'header' variable is already declared globally above.
-  // This listener adds a 'scrolled' class based on a 50px scroll threshold.
-  window.addEventListener('scroll', () => {
+window.addEventListener('scroll', () => {
     if (window.scrollY > 50) {
-      header.classList.add('scrolled');
+        header.classList.add('scrolled');
     } else {
-      header.classList.remove('scrolled');
+        header.classList.remove('scrolled');
     }
-  });
+});
 
 // Mobile Menu Logic
 const toggleMobileMenu = () => {
@@ -69,9 +66,7 @@ document.querySelectorAll('.pkg-card .btn').forEach(btn => {
         const pkgCard = btn.closest('.pkg-card');
         const pkgName = pkgCard.querySelector('h3').innerText;
         const select = document.getElementById('pkgSelect');
-        const contactSection = document.getElementById('contact');
 
-        // Logic to pre-select dropdown
         for (let i = 0; i < select.options.length; i++) {
             if (select.options[i].text.includes(pkgName)) {
                 select.selectedIndex = i;
@@ -79,7 +74,6 @@ document.querySelectorAll('.pkg-card .btn').forEach(btn => {
             }
         }
 
-        // Visual flash on select
         select.style.borderColor = 'var(--secondary)';
         setTimeout(() => select.style.borderColor = '#ddd', 1500);
     });
@@ -91,7 +85,6 @@ document.querySelectorAll('.faq-question').forEach(q => {
         const item = q.parentElement;
         item.classList.toggle('active');
         
-        // Close others
         document.querySelectorAll('.faq-item').forEach(other => {
             if (other !== item) other.classList.remove('active');
         });
@@ -189,6 +182,8 @@ document.body.insertAdjacentHTML('beforeend', portalModalHTML);
 
 const modal = document.getElementById('portalModal');
 const closeBtn = modal.querySelector('.close-modal');
+
+// --- FIXED PART FOR MOBILE & DESKTOP ---
 const viewReportsBtns = document.querySelectorAll('.btn-primary[href="#"]');
 
 viewReportsBtns.forEach(btn => {
@@ -197,6 +192,7 @@ viewReportsBtns.forEach(btn => {
         modal.style.display = 'flex';
     });
 });
+// ---------------------------------------
 
 if (closeBtn) {
     closeBtn.addEventListener('click', () => {
@@ -211,28 +207,18 @@ window.addEventListener('click', (e) => {
 });
 
 // --- Scroll Animations ---
-
-const revealOptions = {
-    threshold: 0.15,
-};
-
+const revealOptions = { threshold: 0.15 };
 const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('active');
-            // Counter Animation if element is an impact item
-            if (entry.target.classList.contains('impact-item')) {
-                animateCounter(entry.target.querySelector('h3'));
-            }
         }
     });
 }, revealOptions);
 
-// Final check to ensure all elements are visible if observer fails
 document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 document.documentElement.classList.add('reveal-ready');
 
-// Safety: Force all visible after 2s
 setTimeout(() => {
     document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
 }, 2000);
@@ -284,7 +270,7 @@ const initPortal = () => {
                 action.innerHTML = `<p style="color:var(--text-muted); font-size:0.9rem; margin-top:10px">Please check again in 2-4 hours.</p>`;
             }
         } catch (error) {
-            alert("Digital portal is temporarily unavailable. Please call 062-2881565.");
+            alert("Digital portal is temporarily unavailable.");
             submitBtn.disabled = false;
             submitBtn.innerHTML = 'Verify Identity & Search';
         }
@@ -324,13 +310,13 @@ if (bookingForm) {
                 setTimeout(() => {
                     btn.disabled = false;
                     btn.innerHTML = originalText;
-                    btn.style.background = ''; // Revert to CSS default
+                    btn.style.background = '';
                 }, 3000);
             } else {
                 throw new Error('Server error');
             }
         } catch (error) {
-            alert("Connection error. Please call us directly at 062 2881565.");
+            alert("Connection error. Please call us directly.");
             btn.disabled = false;
             btn.innerHTML = originalText;
         }
