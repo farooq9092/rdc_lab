@@ -150,6 +150,37 @@ button {
   gap: 15px;
 }
 
+/* --- Navigation --- */
+.top-bar {
+  background: var(--primary);
+  color: var(--bg-white);
+  padding: 10px 0;
+  font-size: 0.85rem;
+  overflow: hidden;
+}
+
+.top-bar-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top-contacts {
+  display: flex;
+  gap: 25px;
+}
+
+.top-contacts span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top-socials {
+  display: flex;
+  gap: 15px;
+}
+
 .header {
   position: sticky;
   top: 0;
@@ -175,9 +206,7 @@ button {
 }
 
 .logo {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
+  flex-shrink: 0;
 }
 
 .logo img {
@@ -187,40 +216,9 @@ button {
   object-fit: contain;
 }
 
-.logo:hover img {
-  transform: scale(1.02);
-}
-
-.logo span {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: var(--primary);
-  letter-spacing: -0.5px;
-}
-
-.logo-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-}
-
-.logo-text .urdu {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--secondary);
-}
-
-.logo-text .eng {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: var(--primary);
-  letter-spacing: -0.5px;
-  text-transform: uppercase;
-}
-
 .nav-menu {
   display: flex;
-  gap: 30px;
+  gap: 25px;
   font-weight: 600;
 }
 
@@ -230,64 +228,143 @@ button {
 
 .nav-btns {
   display: flex;
-  gap: 15px;
+  gap: 10px;
   align-items: center;
 }
 
-.nav-btns .btn i {
-  font-size: 1.1rem;
+.nav-btns .btn {
+  white-space: nowrap;
 }
 
-.nav-btns .btn span {
-  display: inline-block;
-}
+/* Mobile-First Floating Buttons Utility */
+@media (max-width: 900px) {
+  .nav-menu {
+    display: none !important;
+  }
+  
+  .header-flex {
+    padding: 0 10px;
+  }
 
-/* Nav Utility */
-.md-hide {
-  display: inline-flex;
+  .nav-btns .btn span {
+    display: none !important; /* Hide text on mobile icons */
+  }
+
+  .nav-btns .btn {
+    padding: 10px 12px;
+    font-size: 1.2rem;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+  }
+
+  .nav-btns {
+    gap: 8px;
+  }
+
+  .logo img {
+    height: 45px;
+  }
 }
 
 .menu-toggle {
   display: none;
   font-size: 1.8rem;
   color: var(--primary);
-  background: none;
-  border: none;
-  padding: 5px;
   cursor: pointer;
 }
 
 @media (max-width: 900px) {
-  .nav-menu, .md-hide, .nav-btns .btn span {
-    display: none !important;
-  }
-  
-  .nav-btns .btn {
-    padding: 10px 15px;
-    font-size: 1.2rem;
-  }
-
-  .nav-btns .mobile-flex {
-    display: flex !important;
-  }
-
-  .top-bar {
-    padding: 15px 0;
-  }
-  
-  .top-bar-flex {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
-  }
-  
-  .top-contacts {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
   .menu-toggle {
     display: block !important;
+  }
+}
+
+/* --- Feedback Premium Styling --- */
+.feedback-form-wrapper {
+  max-width: 600px;
+  margin: 60px auto 0;
+  padding: 40px;
+  background: white;
+  border-radius: 30px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  border: 1px solid rgba(0, 173, 239, 0.1);
+  z-index: 1;
+}
+
+.feedback-premium-form .form-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.feedback-premium-form .form-header i {
+  font-size: 2.5rem;
+  color: var(--primary);
+  margin-bottom: 15px;
+}
+
+.star-rating {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.star-rating i {
+  font-size: 2rem;
+  color: #ddd;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.star-rating i.active {
+  color: var(--accent);
+  transform: scale(1.2);
+}
+
+.form-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-inputs input, .form-inputs textarea {
+  width: 100%;
+  padding: 15px 20px;
+  border: 2px solid #f1f5f9;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-inputs input:focus, .form-inputs textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.form-inputs textarea {
+  height: 120px;
+  resize: none;
+}
+
+/* Fix Mobile Alignment / Horizontal Scroll */
+body {
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+.container {
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  .section {
+    padding: 60px 0;
+  }
+  .hero-content h1 {
+    font-size: 2.8rem;
   }
 }
 
