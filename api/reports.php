@@ -3,10 +3,12 @@ require_once 'config.php';
 
 $action = $_GET['action'] ?? '';
 
-// Public - Fetch Report
+// Public - Fetch Report (Using 'cnic' parameter as Password for backend stability)
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'fetch') {
     $case_id = $_GET['case_id'] ?? '';
-    $cnic = $_GET['cnic'] ?? '';
+    // The frontend sends 'password' but we'll read it from 'cnic' param if updated in script.js 
+    // or just use 'cnic' for the internal variable.
+    $password = $_GET['cnic'] ?? ''; 
 
     $stmt = $pdo->prepare("SELECT * FROM reports WHERE case_id = ?");
     $stmt->execute([$case_id]);
@@ -15,8 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'fetch') {
     if (!$report) {
         sendJSON(['error' => 'Report not found', 'type' => 'WRONG_ID'], 404);
     }
-    if ($report['cnic'] !== $cnic) {
-        sendJSON(['error' => 'Incorrect CNIC provided', 'type' => 'WRONG_CNIC'], 403);
+    if ($report['cnic'] !== $password) {
+        sendJSON(['error' => 'Incorrect Password provided', 'type' => 'WRONG_PWD'], 403);
     }
     sendJSON($report);
 }
@@ -24,10 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'fetch') {
 // Public - Download Report
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'download') {
     $case_id = $_GET['case_id'] ?? '';
-    $cnic = $_GET['cnic'] ?? '';
+    $password = $_GET['cnic'] ?? '';
 
     $stmt = $pdo->prepare("SELECT * FROM reports WHERE case_id = ? AND cnic = ?");
-    $stmt->execute([$case_id, $cnic]);
+    $stmt->execute([$case_id, $password]);
     $report = $stmt->fetch();
 
     if ($report && !empty($report['file_path'])) {
@@ -73,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'upload') {
     adminOnly();
     
     $case_id = $_POST['case_id'];
-    $cnic = $_POST['cnic'];
+    $password = $_POST['cnic']; // Using 'cnic' field in DB for the password
     $patient_name = $_POST['patient_name'];
     $patient_phone = $_POST['patient_phone'] ?? '';
     $status = $_POST['status'];
@@ -99,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'upload') {
     if (move_uploaded_file($file['tmp_name'], $targetPath)) {
         $stmt = $pdo->prepare("INSERT INTO reports (case_id, cnic, patient_name, patient_phone, status, file_path) VALUES (?, ?, ?, ?, ?, ?)");
         try {
-            $stmt->execute([$case_id, $cnic, $patient_name, $patient_phone, $status, 'uploads/' . $safeName]);
+            $stmt->execute([$case_id, $password, $patient_name, $patient_phone, $status, 'uploads/' . $safeName]);
             sendJSON(['message' => 'Success', 'notified' => $patient_phone]);
         } catch (Exception $e) {
             unlink($targetPath); // Delete file if DB fails

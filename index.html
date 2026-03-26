@@ -56,13 +56,12 @@
     <div class="container top-bar-flex">
       <div class="top-contacts">
         <span><i class="fas fa-phone-alt"></i> 062 2881565 | 0313 6811565</span>
-        <span><i class="far fa-envelope"></i> alrasheeddiagnosticcenter@gmail.com</span>
+        <span><i class="far fa-envelope"></i>alrasheeddiagnosticcenter@gmail.com</span>
         <span><i class="far fa-map-marker-alt"></i> Circular Road, B.V.H Chowk, Bahawalpur</span>
       </div>
       <div class="top-socials">
         <a href="https://www.facebook.com/rdclabbwp" target="_blank"><i class="fab fa-facebook-f"></i></a>
-        <a href="#"><i class="fab fa-twitter"></i></a>
-        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.instagram.com/rdclab1" target="_blank"><i class="fab fa-instagram"></i></a>
         <a href="#"><i class="fab fa-linkedin-in"></i></a>
       </div>
     </div>
@@ -81,14 +80,13 @@
         <a href="#services">Services</a>
         <a href="#tests">Find a Test</a>
         <a href="#packages">Packages</a>
-        <a href="#gallery">Gallery</a>
         <a href="#ceo">CEO Message</a>
         <a href="#contact">Contact</a>
       </nav>
 
       <div class="nav-btns">
         <a href="#" class="btn btn-primary"><i class="fas fa-file-medical"></i> <span>Download Report</span></a>
-        <a href="#contact" class="btn btn-secondary mobile-flex"><i class="far fa-calendar-check"></i> <span>Make Appointment</span></a>
+        <a href="#contact" class="btn btn-secondary mobile-flex"><i class="far fa-calendar-check"></i> <span>Book Appointment</span></a>
         <button class="menu-toggle"><i class="fas fa-bars"></i></button>
       </div>
     </div>
@@ -106,13 +104,12 @@
       <a href="#services">Services</a>
       <a href="#tests">Find a Test</a>
       <a href="#packages">Packages</a>
-      <a href="#gallery">Gallery</a>
       <a href="#faq">FAQ</a>
       <a href="#contact">Contact</a>
     </div>
     <div class="mobile-nav-cta">
       <a href="#" class="btn btn-primary" style="width:100%; margin-bottom:15px">Download Report</a>
-      <a href="#contact" class="btn btn-secondary" style="width:100%">Make Appointment</a>
+      <a href="#contact" class="btn btn-secondary" style="width:100%">Book Appointment</a>
     </div>
   </div>
 
@@ -382,8 +379,6 @@
             <a href="#contact" class="btn btn-primary" style="width:100%">Buy Package</a>
           </div>
         </div>
-      </div>
-    </div>
   </section>
 
   <!-- Events Gallery Section -->
@@ -400,7 +395,7 @@
     </div>
   </section>
 
-  <!-- Feedback & Rating Section -->
+  <!-- Feedback & Testimonials Section -->
   <section class="section" id="feedback" style="background: var(--bg-light)">
     <div class="container">
       <div class="section-title reveal">
@@ -412,8 +407,7 @@
         <button class="slider-btn prev-btn"><i class="fas fa-chevron-left"></i></button>
         <div class="testimonial-slider">
           <div id="feedbackGrid" class="testimonial-track">
-            <!-- Dynamic Testimonials here -->
-            <div class="mock-result-text">Loading reviews...</div>
+            <!-- Dynamic Testimonials -->
           </div>
         </div>
         <button class="slider-btn next-btn"><i class="fas fa-chevron-right"></i></button>
@@ -447,7 +441,7 @@
   </section>
 
   <!-- FAQ Section -->
-  <section class="section" id="faq" style="background: #fff">
+  <section class="section" id="faq" style="background: var(--bg-light)">
     <div class="container">
       <div class="section-title reveal">
         <h2>Frequently Asked Questions</h2>
@@ -648,6 +642,36 @@
       </div>
     </div>
   </footer>
+
+  <!-- Portals & Modals -->
+  <div id="patientPortal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div class="modal-header">
+        <i class="fas fa-user-lock"></i>
+        <h2>Patient Report Portal</h2>
+        <p>Enter your details to view and download your report</p>
+      </div>
+      <form id="portalForm" class="portal-form">
+        <div class="input-group">
+          <i class="fas fa-hashtag"></i>
+          <input type="text" id="caseId" placeholder="Lab Case Number (e.g. 12345)" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-key"></i>
+          <input type="password" id="password" placeholder="Patient Password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Fetch My Report</button>
+      </form>
+      <div id="reportResult" class="report-container" style="display: none;"></div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox">
+    <span class="close-lightbox">&times;</span>
+    <img class="lightbox-content" id="lightboxImg">
+  </div>
 
   <script src="script.js"></script>
 </body>
