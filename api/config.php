@@ -3,8 +3,8 @@
 // Fill these in with your actual Hostinger Database details
 
 define('DB_HOST', 'localhost'); // Often localhost on Hostinger
-define('DB_NAME', 'u932844992_rdc'); // Your Hostinger DB Name
-define('DB_USER', 'u932844992_rdclab'); // Your Hostinger DB User
+define('DB_NAME', 'u932844992_rdc_db'); // Your Hostinger DB Name
+define('DB_USER', 'u932844992_rdc'); // Your Hostinger DB User
 define('DB_PASS', 'farooq@Domain1'); // Your Hostinger DB Password
 
 try {

@@ -4,12 +4,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Al-Rasheed Diagnostic Center | Trusted Medical Diagnostic Center & Laboratory</title>
+  <title>Best Diagnostic Center in Bahawalpur | Al-Rasheed Lab & Home Sampling</title>
   <meta name="description"
-    content="Al-Rasheed Diagnostic Center provides premium medical diagnostic services, health packages, and home sampling with precision and trust.">
+    content="Al-Rasheed Diagnostic Center Bahawalpur: Best private medical lab near BVH Chowk. 2000+ tests including Home Sampling, Radiology, and Pathology with 24/7 service.">
+  <meta name="keywords" content="Diagnostic Center Bahawalpur, Medical Lab Bahawalpur, Home Sampling Bahawalpur, Blood Test Bahawalpur, Al-Rasheed Lab, BVH Chowk Lab">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script>document.documentElement.classList.add('js-active');</script>
+  
+  <!-- Local Business Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MedicalBusiness",
+    "name": "Al-Rasheed Diagnostic Center",
+    "alternateName": "RDC Lab Bahawalpur",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Circular Road, BVH Chowk",
+      "addressLocality": "Bahawalpur",
+      "addressRegion": "Punjab",
+      "postalCode": "63100",
+      "addressCountry": "PK"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 29.3909,
+      "longitude": 71.6797
+    },
+    "url": "http://www.rdcpk.com",
+    "telephone": "0622881565",
+    "priceRange": "$$",
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+        ],
+        "opens": "00:00",
+        "closes": "23:59"
+      }
+    ]
+  }
+  </script>
 </head>
 
 <body>
@@ -19,12 +56,13 @@
     <div class="container top-bar-flex">
       <div class="top-contacts">
         <span><i class="fas fa-phone-alt"></i> 062 2881565 | 0313 6811565</span>
-        <span><i class="far fa-envelope"></i>alrasheeddiagnosticcenter@gmail.com</span>
+        <span><i class="far fa-envelope"></i> alrasheeddiagnosticcenter@gmail.com</span>
         <span><i class="far fa-map-marker-alt"></i> Circular Road, B.V.H Chowk, Bahawalpur</span>
       </div>
       <div class="top-socials">
         <a href="https://www.facebook.com/rdclabbwp" target="_blank"><i class="fab fa-facebook-f"></i></a>
-        <a href="https://www.instagram.com/rdclab1" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
         <a href="#"><i class="fab fa-linkedin-in"></i></a>
       </div>
     </div>
@@ -43,13 +81,14 @@
         <a href="#services">Services</a>
         <a href="#tests">Find a Test</a>
         <a href="#packages">Packages</a>
+        <a href="#gallery">Gallery</a>
         <a href="#ceo">CEO Message</a>
         <a href="#contact">Contact</a>
       </nav>
 
       <div class="nav-btns">
-        <a href="#" class="btn btn-primary"><i class="fas fa-file-medical"></i> View Reports</a>
-        <a href="#contact" class="btn btn-secondary md-hide"><i class="far fa-calendar-check"></i> Make Appointment</a>
+        <a href="#" class="btn btn-primary"><i class="fas fa-file-medical"></i> <span>Download Report</span></a>
+        <a href="#contact" class="btn btn-secondary mobile-flex"><i class="far fa-calendar-check"></i> <span>Make Appointment</span></a>
         <button class="menu-toggle"><i class="fas fa-bars"></i></button>
       </div>
     </div>
@@ -67,11 +106,12 @@
       <a href="#services">Services</a>
       <a href="#tests">Find a Test</a>
       <a href="#packages">Packages</a>
+      <a href="#gallery">Gallery</a>
       <a href="#faq">FAQ</a>
       <a href="#contact">Contact</a>
     </div>
     <div class="mobile-nav-cta">
-      <a href="#" class="btn btn-primary" style="width:100%; margin-bottom:15px">View Reports</a>
+      <a href="#" class="btn btn-primary" style="width:100%; margin-bottom:15px">Download Report</a>
       <a href="#contact" class="btn btn-secondary" style="width:100%">Make Appointment</a>
     </div>
   </div>
@@ -346,8 +386,68 @@
     </div>
   </section>
 
+  <!-- Events Gallery Section -->
+  <section class="section" id="gallery">
+    <div class="container">
+      <div class="section-title reveal">
+        <h2>Events & Facility Gallery</h2>
+        <p>Glimpses of our advanced clinical facilities and community health initiatives</p>
+      </div>
+      <div id="galleryGrid" class="gallery-grid reveal">
+        <!-- Gallery items will load dynamically via script.js -->
+        <div class="mock-result-text">Loading gallery...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feedback & Rating Section -->
+  <section class="section" id="feedback" style="background: var(--bg-light)">
+    <div class="container">
+      <div class="section-title reveal">
+        <h2>Patient Feedback</h2>
+        <p>Your health and satisfaction are our top priorities. Share your experience with us.</p>
+      </div>
+      
+      <div class="testimonial-slider-container reveal">
+        <button class="slider-btn prev-btn"><i class="fas fa-chevron-left"></i></button>
+        <div class="testimonial-slider">
+          <div id="feedbackGrid" class="testimonial-track">
+            <!-- Dynamic Testimonials here -->
+            <div class="mock-result-text">Loading reviews...</div>
+          </div>
+        </div>
+        <button class="slider-btn next-btn"><i class="fas fa-chevron-right"></i></button>
+        <div class="slider-dots" id="sliderDots"></div>
+      </div>
+
+      <div class="feedback-form-wrapper reveal">
+        <div class="form-decorative-blob"></div>
+        <form id="feedbackForm" class="feedback-premium-form">
+          <div class="form-header">
+            <i class="fas fa-pen-nib"></i>
+            <h3>Share Your Experience</h3>
+            <p>Help us improve by sharing your thoughts</p>
+          </div>
+          <div class="star-rating" id="starRating">
+            <i class="far fa-star" data-rating="1"></i>
+            <i class="far fa-star" data-rating="2"></i>
+            <i class="far fa-star" data-rating="3"></i>
+            <i class="far fa-star" data-rating="4"></i>
+            <i class="far fa-star" data-rating="5"></i>
+            <input type="hidden" name="rating" id="ratingInput" value="0">
+          </div>
+          <div class="form-inputs">
+            <input type="text" placeholder="Full Name" required>
+            <textarea placeholder="Tell us about your diagnostic experience..." required></textarea>
+            <button type="submit" class="btn btn-primary">Submit Your Review</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
   <!-- FAQ Section -->
-  <section class="section" id="faq" style="background: var(--bg-light)">
+  <section class="section" id="faq" style="background: #fff">
     <div class="container">
       <div class="section-title reveal">
         <h2>Frequently Asked Questions</h2>
