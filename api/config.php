@@ -4,7 +4,7 @@
 $host = 'localhost';
 $db   = 'u123456789_rdc'; // Your Database Name
 $user = 'u123456789_rdclab'; // Your Database Username
-$pass = 'admin@Domain1'; // Your Database Password
+$pass = 'farooq@Domain1'; // Your Database Password
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
