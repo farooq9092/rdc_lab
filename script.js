@@ -109,8 +109,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Portal Modal Logic
     const portalModal = document.getElementById('patientPortal');
-    const portalTriggers = document.querySelectorAll('.portal-trigger');
+    
+    // Auto-identify triggers by text as fallback
+    document.querySelectorAll('.btn').forEach(btn => {
+        if (btn.innerText.includes('Download') || btn.innerText.includes('Report')) {
+            btn.classList.add('portal-trigger');
+        }
+    });
 
+    const portalTriggers = document.querySelectorAll('.portal-trigger');
     portalTriggers.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
