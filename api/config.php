@@ -1,46 +1,35 @@
 <?php
-// Database configuration
-// Replace with your actual Hostinger HPanel details
-$host = 'localhost';
-$db   = 'u123456789_rdc'; // Your Database Name
-$user = 'u123456789_rdclab'; // Your Database Username
-$pass = 'farooq@Domain1'; // Your Database Password
-$charset = 'utf8mb4';
+// Database Configuration for Hostinger MySQL
+// Fill these in with your actual Hostinger Database details
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = [
-    PDO::ATTR_ERR_MODE            => PDO::ERR_MODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
-];
+define('DB_HOST', 'localhost'); // Often localhost on Hostinger
+define('DB_NAME', 'u932844992_rdc'); // Your Hostinger DB Name
+define('DB_USER', 'u932844992_rdclab'); // Your Hostinger DB User
+define('DB_PASS', 'farooq@Domain1'); // Your Hostinger DB Password
 
 try {
-     $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
-     // For production, you might want a more subtle error
-     // die("Connection failed: " . $e->getMessage());
-     header("HTTP/1.1 500 Internal Server Error");
-     echo json_encode(['error' => 'Database connection failed. Please check api/config.php']);
-     exit;
+    $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
 }
 
-// Utility function for JSON responses
-function sendJSON($data, $status = 200) {
-    http_response_code($status);
+// Security Helper
+function sendJSON($data, $code = 200)
+{
     header('Content-Type: application/json');
+    http_response_code($code);
     echo json_encode($data);
     exit;
 }
 
-// Admin Session Check
-session_start();
-function isAdmin() {
-    return isset($_SESSION['admin_auth']) && $_SESSION['admin_auth'] === true;
-}
-
-function adminOnly() {
-    if (!isAdmin()) {
-        sendJSON(['error' => 'Unauthorized'], 401);
+// Login Required Helper
+function adminOnly()
+{
+    session_start();
+    if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+        sendJSON(['error' => 'Unauthorized Access'], 401);
     }
 }
 ?>
