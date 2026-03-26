@@ -2,9 +2,9 @@
 // Database configuration
 // Replace with your actual Hostinger HPanel details
 $host = 'localhost';
-$db   = 'u123456789_rdclab'; // Your Database Name
-$user = 'u123456789_admin'; // Your Database Username
-$pass = 'your_strong_password'; // Your Database Password
+$db   = 'u123456789_rdc'; // Your Database Name
+$user = 'u123456789_rdclab'; // Your Database Username
+$pass = 'admin@Domain1'; // Your Database Password
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
