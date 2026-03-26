@@ -109,15 +109,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Portal Modal Logic
     const portalModal = document.getElementById('patientPortal');
-    const openPortalBtns = document.querySelectorAll('.btn-primary, .btn-secondary');
+    const portalTriggers = document.querySelectorAll('.portal-trigger');
 
-    openPortalBtns.forEach(btn => {
-        if (btn.innerText.includes('Download') || btn.innerText.includes('Report')) {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (portalModal) portalModal.classList.add('active');
-            });
-        }
+    portalTriggers.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (portalModal) portalModal.classList.add('active');
+        });
     });
 
     if(portalModal) {
