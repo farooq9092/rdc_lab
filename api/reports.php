@@ -78,6 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'upload') {
     $password = $_POST['cnic']; // Using 'cnic' field in DB for the password
     $patient_name = $_POST['patient_name'];
     $patient_phone = $_POST['patient_phone'] ?? '';
+    $test_name = $_POST['test_name'] ?? 'Diagnostic Test';
+    $gender = $_POST['gender'] ?? '';
+    $age = $_POST['age'] ?? '';
     $status = $_POST['status'];
 
     if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
@@ -99,13 +102,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'upload') {
     $targetPath = $uploadDir . $safeName;
 
     if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-        $stmt = $pdo->prepare("INSERT INTO reports (case_id, cnic, patient_name, patient_phone, status, file_path) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO reports (case_id, cnic, patient_name, patient_phone, test_name, gender, age, status, file_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         try {
-            $stmt->execute([$case_id, $password, $patient_name, $patient_phone, $status, 'uploads/' . $safeName]);
+            $stmt->execute([$case_id, $password, $patient_name, $patient_phone, $test_name, $gender, $age, $status, 'uploads/' . $safeName]);
             sendJSON(['message' => 'Success', 'notified' => $patient_phone]);
         } catch (Exception $e) {
             unlink($targetPath); // Delete file if DB fails
-            sendJSON(['error' => 'Case ID already exists or DB Error'], 400);
+            sendJSON(['error' => 'Case ID already exists or DB Error: ' . $e->getMessage()], 400);
         }
     } else {
         sendJSON(['error' => 'Failed to save file'], 500);
