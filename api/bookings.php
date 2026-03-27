@@ -3,43 +3,44 @@ require_once 'config.php';
 
 $action = $_GET['action'] ?? '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'create') {
+// Public - Submit Booking
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'submit') {
     $data = json_decode(file_get_contents('php://input'), true);
-    
-    $stmt = $pdo->prepare("INSERT INTO bookings (patient_name, phone, package, address) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$data['name'], $data['phone'], $data['package'], $data['address']]);
-    
-    sendJSON(['message' => 'Booking received successfully!']);
+    $name = $data['name'] ?? '';
+    $phone = $data['phone'] ?? '';
+    $package = $data['package'] ?? 'General Inquiry';
+    $address = $data['address'] ?? '';
+
+    if (!$name || !$phone) {
+        sendJSON(['error' => 'Name and Phone are required'], 400);
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO bookings (name, phone, package, address) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$name, $phone, $package, $address]);
+
+    sendJSON(['message' => 'Appointment request submitted successfully']);
 }
 
-// Admin Operations
+// Admin - List Bookings
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'list') {
     adminOnly();
     $stmt = $pdo->query("SELECT * FROM bookings ORDER BY created_at DESC");
     sendJSON($stmt->fetchAll());
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'PUT' && $action === 'status') {
-    adminOnly();
-    $bid = $_GET['id'] ?? 0;
-    $data = json_decode(file_get_contents('php://input'), true);
-    
-    $stmt = $pdo->prepare("UPDATE bookings SET status = ? WHERE id = ?");
-    $stmt->execute([$data['status'], $bid]);
-    sendJSON(['message' => 'Status updated']);
-}
-
+// Admin - Delete Booking
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && $action === 'delete') {
     adminOnly();
-    $bid = $_GET['id'] ?? 0;
+    $id = $_GET['id'] ?? '';
     $stmt = $pdo->prepare("DELETE FROM bookings WHERE id = ?");
-    $stmt->execute([$bid]);
+    $stmt->execute([$id]);
     sendJSON(['message' => 'Booking deleted']);
 }
 
+// Admin - Delete All
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && $action === 'deleteAll') {
     adminOnly();
     $pdo->query("DELETE FROM bookings");
-    sendJSON(['message' => 'All bookings deleted']);
+    sendJSON(['message' => 'All bookings cleared']);
 }
 ?>

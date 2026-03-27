@@ -15,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'login') {
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['admin_auth'] = true;
         $_SESSION['username'] = $user['username'];
+        session_write_close(); // Force save session
         sendJSON(['message' => 'Login Successful']);
     } else {
         sendJSON(['error' => 'Invalid credentials'], 401);
