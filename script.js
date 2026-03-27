@@ -231,6 +231,62 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Test Search Functionality
+    const testSearchInput = document.getElementById('testSearchInput');
+    const testResults = document.getElementById('testResults');
+    const testDatabase = [
+        { name: "Complete Blood Count (CBC)", price: "800", time: "Same Day" },
+        { name: "Blood Sugar Fasting (BSF)", price: "250", time: "Same Day" },
+        { name: "Blood Sugar Random (BSR)", price: "250", time: "Same Day" },
+        { name: "Lipid Profile", price: "1800", time: "Same Day" },
+        { name: "Liver Function Tests (LFTs)", price: "1200", time: "Same Day" },
+        { name: "Renal Function Tests (RFTs)", price: "1400", time: "Same Day" },
+        { name: "Thyroid Profile (T3, T4, TSH)", price: "2500", time: "Same Day" },
+        { name: "Vitamin D3", price: "2800", time: "24 Hours" },
+        { name: "HbA1c", price: "1200", time: "Same Day" },
+        { name: "Uric Acid", price: "400", time: "Same Day" },
+        { name: "Urine Routine Examination", price: "300", time: "Same Day" },
+        { name: "Serum Calcium", price: "450", time: "Same Day" },
+        { name: "Hepatitis B Surface Antigen (HBsAg)", price: "600", time: "Same Day" },
+        { name: "Anti HCV", price: "800", time: "Same Day" },
+        { name: "C-Reactive Protein (CRP)", price: "900", time: "Same Day" },
+        { name: "Widal Test", price: "600", time: "Same Day" },
+        { name: "Typhidot", price: "1000", time: "Same Day" },
+        { name: "Dengue NS1 Antigen", price: "1500", time: "Same Day" },
+        { name: "Malaria Parasite (MP)", price: "300", time: "Same Day" },
+        { name: "Serum Electrolytes", price: "1000", time: "Same Day" }
+    ];
+
+    if (testSearchInput && testResults) {
+        testSearchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            if (query.length < 2) {
+                testResults.innerHTML = '<div class="mock-result-text">Start typing to find medical tests...</div>';
+                return;
+            }
+
+            const filtered = testDatabase.filter(t => t.name.toLowerCase().includes(query));
+            
+            if (filtered.length === 0) {
+                testResults.innerHTML = '<div class="mock-result-text" style="color:#e74c3c">No tests found matching your search. Please call us for details.</div>';
+                return;
+            }
+
+            testResults.innerHTML = filtered.map(t => `
+                <div class="test-item" style="background:#fff; padding:15px; border-radius:10px; border-left:4px solid var(--primary); margin-bottom:10px; box-shadow:0 2px 10px rgba(0,0,0,0.05); display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <h4 style="margin:0; color:var(--secondary); font-size:1.1rem;">${t.name}</h4>
+                        <span style="font-size:0.8rem; color:#666;"><i class="far fa-clock"></i> Report: ${t.time}</span>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="display:block; font-weight:700; color:var(--primary); font-size:1.2rem;">Rs. ${t.price}</span>
+                        <button onclick="document.getElementById('contact').scrollIntoView();" style="background:none; border:none; color:var(--secondary); font-size:0.8rem; cursor:pointer; text-decoration:underline;">Book Now</button>
+                    </div>
+                </div>
+            `).join('');
+        });
+    }
+
     // Initial Load
     loadPublicGallery();
     loadPublicFeedback();
