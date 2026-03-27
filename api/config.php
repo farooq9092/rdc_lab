@@ -2,8 +2,8 @@
 // Database configuration
 // Replace with your actual Hostinger HPanel details
 $host = 'localhost';
-$db = 'u123456789_rdc'; // Your Database Name
-$user = 'u123456789_rdclab'; // Your Database Username
+$db = 'u932844992_rdc'; // Your Database Name
+$user = 'u932844992_rdclab'; // Your Database Username
 $pass = 'farooq@Domain1'; // Your Database Password
 $charset = 'utf8mb4';
 
