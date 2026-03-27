@@ -3,23 +3,29 @@ require_once 'config.php';
 
 $action = $_GET['action'] ?? '';
 
-// Public - Fetch Report (Using 'cnic' parameter as Password for backend stability)
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'fetch') {
-    $case_id = $_GET['case_id'] ?? '';
-    // The frontend sends 'password' but we'll read it from 'cnic' param if updated in script.js 
-    // or just use 'cnic' for the internal variable.
-    $password = $_GET['cnic'] ?? ''; 
+// Public - Fetch Report (Using POST for better server compatibility)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'fetch') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $case_id = trim($data['case_id'] ?? '');
+    $password = trim($data['cnic'] ?? '');
+
+    if (!$case_id || !$password) {
+        sendJSON(['error' => 'Case ID and Password are required'], 400);
+    }
 
     $stmt = $pdo->prepare("SELECT * FROM reports WHERE case_id = ?");
     $stmt->execute([$case_id]);
     $report = $stmt->fetch();
 
     if (!$report) {
-        sendJSON(['error' => 'Report not found', 'type' => 'WRONG_ID'], 404);
+        sendJSON(['error' => 'Report not found. Please double-check your Case ID.'], 404);
     }
-    if ($report['cnic'] !== $password) {
-        sendJSON(['error' => 'Incorrect Password provided', 'type' => 'WRONG_PWD'], 403);
+    
+    // Use trim to ensure matching even with accidental database spaces
+    if (trim($report['cnic']) !== $password) {
+        sendJSON(['error' => 'Incorrect Password. Please check the credentials sent to you.'], 403);
     }
+    
     sendJSON($report);
 }
 
