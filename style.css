@@ -237,61 +237,58 @@ button {
   padding: 12px 20px;
 }
 
-/* --- Mobile Header Overhaul --- */
+/* --- Mobile Overhaul --- */
 @media (max-width: 900px) {
-  .header {
-    padding: 10px 0;
-  }
-  
-  .nav-menu {
-    display: none !important;
-  }
+  .top-bar { padding: 15px 10px; }
+  .top-bar-flex { flex-direction: column; gap: 12px; }
+  .top-contacts { flex-direction: column; align-items: center; gap: 8px; text-align: center; font-size: 0.85rem; }
+  .top-contacts span { justify-content: center; }
+  .top-socials { justify-content: center; margin-top: 5px; }
+
+  .header { padding: 10px 0; }
+  .nav-menu { display: none !important; }
   
   .header-flex {
     flex-direction: column;
     gap: 15px;
+    align-items: center;
   }
 
   .nav-btns {
     width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr 50px; /* Two big buttons + Menu toggle */
+    display: flex;
+    justify-content: space-between;
     gap: 8px;
   }
 
   .nav-btns .btn {
-    width: 100%;
-    font-size: 0.85rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
     padding: 10px 5px;
     border-radius: 8px;
+    text-align: center;
+    white-space: normal; /* Handle long text */
+    line-height: 1.2;
   }
 
-  .nav-btns .btn i {
-    display: block;
-    font-size: 1.2rem;
-    margin-bottom: 2px;
-  }
-
-  .nav-btns .btn span {
-    display: block !important;
-    font-size: 0.75rem;
-    font-weight: 700;
-  }
+  .nav-btns .btn i { display: block; font-size: 1.2rem; margin-bottom: 4px; }
+  .nav-btns .btn span { display: block !important; font-size: 0.75rem; font-weight: 700; }
 
   .menu-toggle {
     display: flex !important;
     align-items: center;
     justify-content: center;
-    height: 100%;
+    width: 50px;
     background: #f1f5f9;
     border-radius: 8px;
   }
 
-  .logo img {
-    height: 50px;
-  }
+  .logo img { height: 50px; }
 }
-
 /* --- Gallery Stylish Frames --- */
 .gallery-grid {
     display: grid;
@@ -1463,6 +1460,7 @@ body {
 
 @media (max-width: 768px) {
   .testimonial-slider-container { padding: 0 10px; }
+  .testimonial-card { padding: 30px 15px; }
   .slider-btn { display: none; }
 }
 
