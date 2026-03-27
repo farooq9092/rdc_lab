@@ -159,12 +159,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 portalForm.style.display = 'none';
                 resultDiv.style.display = 'block';
                 resultDiv.innerHTML = `
-                    <h3>Welcome, ${data.patient_name}</h3>
-                    <p>Status: <span style="background:#d4edda; padding:5px 10px; border-radius:15px;">${data.status}</span></p>
-                    <p>Test: ${data.test_name}</p>
+                    <div style="text-align:left; border-bottom:2px solid #eee; padding-bottom:15px; margin-bottom:15px;">
+                        <h3 style="color:var(--primary); margin:0;">${data.patient_name}</h3>
+                        <p style="margin:5px 0; color:#666;">Case ID: #${data.case_id} | ${data.gender || 'N/A'} | ${data.age || 'N/A'}</p>
+                    </div>
+                    <div style="background:#f9fafb; padding:15px; border-radius:10px; margin-bottom:20px;">
+                        <p style="margin:0; font-weight:600; color:var(--text);">Test: ${data.test_name || 'Laboratory Test'}</p>
+                        <p style="margin:5px 0 0; font-size:0.9rem;">Status: <span style="color:${data.status === 'Final' ? '#2ecc71' : '#e67e22'}; font-weight:bold;">${data.status}</span></p>
+                    </div>
                     ${data.status === 'Final' ? 
-                      `<a href="api/reports.php?action=download&case_id=${caseId}&cnic=${password}" class="btn btn-primary" style="width:100%; margin-top:20px"><i class="fas fa-download"></i> Download Official Report</a>` : 
-                      `<p style="color:var(--secondary); margin-top:10px; font-weight:600;">Your report is being processed. Typical wait time is 4-6 hours.</p>`}
+                      `<a href="api/reports.php?action=download&case_id=${caseId}&cnic=${password}" class="btn btn-primary" style="width:100%;"><i class="fas fa-download"></i> Download Official Report (PDF)</a>` : 
+                      `<div style="background:#fff3cd; padding:15px; border-radius:8px; border-left:4px solid #ffc107;">
+                          <p style="margin:0; color:#856404; font-size:0.9rem;"><strong>In Progress:</strong> Your sample is currently being processed. Please check back in a few hours.</p>
+                       </div>`}
+                    <button class="btn" style="margin-top:20px; width:100%; background:#eee; color:#333;" onclick="location.reload()">Back to Search</button>
                 `;
             } catch (err) {
                 alert(err.message || "Could not retrieve report. Check Case ID/Password.");
