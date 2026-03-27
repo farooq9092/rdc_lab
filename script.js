@@ -148,31 +148,40 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...';
 
             try {
-                const res = await fetch(`api/reports.php?action=fetch&case_id=${caseId}&cnic=${password}`);
-                const data = await res.json().catch(() => ({ error: "Server returned invalid response" }));
+                const searchUrl = `api/reports.php?action=fetch&case_id=${encodeURIComponent(caseId)}&cnic=${encodeURIComponent(password)}`;
+                const res = await fetch(searchUrl);
+                
+                // If response is not JSON (e.g. 500 error), catch it
+                let data = {};
+                try {
+                    data = await res.json();
+                } catch(e) {
+                    throw new Error("Server communication error. Please try again later.");
+                }
 
                 if (!res.ok) {
-                    const errorMsg = data.error || (res.status === 403 ? "Incorrect Password" : "Report not found");
+                    const errorMsg = data.error || (res.status === 403 ? "Incorrect Password" : "Report not found (Check Case ID)");
                     throw new Error(errorMsg);
                 }
+
+                if (!data.case_id) throw new Error("Report found but data is incomplete.");
 
                 portalForm.style.display = 'none';
                 resultDiv.style.display = 'block';
                 resultDiv.innerHTML = `
-                    <div style="text-align:left; border-bottom:2px solid #eee; padding-bottom:15px; margin-bottom:15px;">
+                    <div style="padding: 20px; text-align: left; border-bottom: 2px solid var(--primary-light);">
                         <h3 style="color:var(--primary); margin:0;">${data.patient_name}</h3>
-                        <p style="margin:5px 0; color:#666;">Case ID: #${data.case_id} | ${data.gender || 'N/A'} | ${data.age || 'N/A'}</p>
+                        <p style="margin:5px 0 0; color:#666;">Case ID: #${data.case_id}</p>
                     </div>
-                    <div style="background:#f9fafb; padding:15px; border-radius:10px; margin-bottom:20px;">
-                        <p style="margin:0; font-weight:600; color:var(--text);">Test: ${data.test_name || 'Laboratory Test'}</p>
-                        <p style="margin:5px 0 0; font-size:0.9rem;">Status: <span style="color:${data.status === 'Final' ? '#2ecc71' : '#e67e22'}; font-weight:bold;">${data.status}</span></p>
+                    <div style="padding: 20px;">
+                        <p style="margin:0 0 15px; font-size:1.1rem;">Status: <span style="background:${data.status === 'Final' ? '#d4edda' : '#fff3cd'}; padding:5px 12px; border-radius:20px; font-weight:bold; font-size:0.9rem;">${data.status}</span></p>
+                        ${data.status === 'Final' ? 
+                          `<a href="api/reports.php?action=download&case_id=${encodeURIComponent(caseId)}&cnic=${encodeURIComponent(password)}" class="btn btn-primary" style="width:100%;"><i class="fas fa-download"></i> Download Official PDF Report</a>` : 
+                          `<div style="background:#f8f9fa; padding:15px; border-radius:10px; border-left:4px solid var(--secondary);">
+                              <p style="margin:0; color:#666; font-size:0.9rem;"><strong>Processing:</strong> Your laboratory results are currently undergoing verification. Please check back after 4-6 hours.</p>
+                           </div>`}
+                        <button class="btn" style="margin-top:20px; width:100%; background:#eee; color:#333;" onclick="location.reload()">Return to Search</button>
                     </div>
-                    ${data.status === 'Final' ? 
-                      `<a href="api/reports.php?action=download&case_id=${caseId}&cnic=${password}" class="btn btn-primary" style="width:100%;"><i class="fas fa-download"></i> Download Official Report (PDF)</a>` : 
-                      `<div style="background:#fff3cd; padding:15px; border-radius:8px; border-left:4px solid #ffc107;">
-                          <p style="margin:0; color:#856404; font-size:0.9rem;"><strong>In Progress:</strong> Your sample is currently being processed. Please check back in a few hours.</p>
-                       </div>`}
-                    <button class="btn" style="margin-top:20px; width:100%; background:#eee; color:#333;" onclick="location.reload()">Back to Search</button>
                 `;
             } catch (err) {
                 alert(err.message || "Could not retrieve report. Check Case ID/Password.");
