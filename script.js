@@ -149,9 +149,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const res = await fetch(`api/reports.php?action=fetch&case_id=${caseId}&cnic=${password}`);
-                const data = await res.json();
+                const data = await res.json().catch(() => ({ error: "Server returned invalid response" }));
 
-                if (!res.ok) throw new Error(data.error);
+                if (!res.ok) {
+                    const errorMsg = data.error || (res.status === 403 ? "Incorrect Password" : "Report not found");
+                    throw new Error(errorMsg);
+                }
 
                 portalForm.style.display = 'none';
                 resultDiv.style.display = 'block';
@@ -168,6 +171,44 @@ document.addEventListener('DOMContentLoaded', () => {
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = 'Fetch My Report';
+            }
+        });
+    }
+
+    // Booking Form Submission
+    const bookingForm = document.getElementById('bookingForm');
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = bookingForm.querySelector('button');
+            const name = bookingForm.querySelector('input[type="text"]').value;
+            const phone = bookingForm.querySelector('input[type="tel"]').value;
+            const packageValue = document.getElementById('pkgSelect').value;
+            const address = bookingForm.querySelector('textarea').value;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            try {
+                const res = await fetch('api/bookings.php?action=submit', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ name, phone, package: packageValue, address })
+                });
+                if (res.ok) {
+                    bookingForm.innerHTML = `
+                        <div style="text-align:center; padding:30px; background:#f0f7ff; border-radius:15px; border:2px dashed var(--primary);">
+                            <i class="fas fa-check-circle" style="font-size:3rem; color:var(--primary); margin-bottom:15px;"></i>
+                            <h3>Request Received!</h3>
+                            <p>Our team will contact you within 15 minutes to confirm your home sampling.</p>
+                        </div>`;
+                } else {
+                    alert("Error submitting booking. Please try again.");
+                }
+            } catch (err) { alert("Network error. Please call us directly."); }
+            finally { 
+                btn.disabled = false; 
+                btn.innerHTML = 'Request Sample Collection';
             }
         });
     }
