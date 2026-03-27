@@ -1550,3 +1550,14 @@ body {
 .modal .close:hover { color: var(--secondary); }
 .report-container { background: #f8fafc; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid #e2e8f0; }
 
+
+/* --- Mobile Header Fix --- */
+@media (max-width: 768px) {
+  .md-hide { display: none !important; }
+  .header-flex { padding: 10px 15px; }
+  .nav-btns { gap: 10px; }
+  .btn-primary.portal-trigger { padding: 8px 15px; font-size: 0.85rem; }
+  .nav-btns .btn i { margin-right: 5px; }
+  .nav-btns .btn span { display: inline !important; } 
+}
+
