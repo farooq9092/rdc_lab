@@ -643,29 +643,55 @@
     </div>
   </footer>
 
-  <!-- Portals & Modals -->
-  <div id="patientPortal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <div class="modal-header">
-        <i class="fas fa-user-lock"></i>
-        <h2>Patient Report Portal</h2>
-        <p>Enter your details to view and download your report</p>
-      </div>
-      <form id="portalForm" class="portal-form">
-        <div class="input-group">
-          <i class="fas fa-hashtag"></i>
-          <input type="text" id="caseId" placeholder="Lab Case Number (e.g. 12345)" required>
-        </div>
-        <div class="input-group">
-          <i class="fas fa-key"></i>
-          <input type="password" id="password" placeholder="Patient Password" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Fetch My Report</button>
+  <!-- Direct Report Portal (Bypasses all JS issues) -->
+  <style>
+    #patientPortalNew {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
+      z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px);
+    }
+    .portal-box {
+      background: #fff; padding: 40px; border-radius: 20px; width: 90%; max-width: 400px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5); position: relative; text-align: center;
+    }
+    .portal-box .close { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: #999; }
+    .portal-box .close:hover { color: #f00; }
+    .portal-box h2 { color: #00adef; margin-bottom: 10px; font-size: 1.8rem; }
+    .portal-box p { color: #666; margin-bottom: 25px; font-size: 0.9rem; line-height: 1.4; }
+    .portal-box input { 
+      width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #ddd; 
+      margin-bottom: 15px; font-size: 1rem; box-sizing: border-box;
+    }
+    .portal-box button { width: 100%; padding: 15px; border-radius: 10px; font-weight: 700; font-size: 1.1rem; }
+  </style>
+
+  <div id="patientPortalNew">
+    <div class="portal-box">
+      <span class="close" onclick="document.getElementById('patientPortalNew').style.display='none'">&times;</span>
+      <i class="fas fa-file-pdf" style="font-size:3rem; color:#00adef; margin-bottom:20px;"></i>
+      <h2>Report Download</h2>
+      <p>Enter your Lab ID & Password provided at the time of sampling.</p>
+      
+      <!-- Direct Submission to PHP -->
+      <form action="api/reports.php" method="GET">
+        <input type="hidden" name="action" value="download">
+        <input type="text" name="case_id" placeholder="Lab Case Number (e.g. 12345)" required>
+        <input type="password" name="cnic" placeholder="Your Password/CNIC" required>
+        <button type="submit" class="btn btn-primary">DOWNLOAD MY REPORT</button>
       </form>
-      <div id="reportResult" class="report-container" style="display: none;"></div>
     </div>
   </div>
+
+  <script>
+    // Force open the new portal for all triggers
+    window.addEventListener('load', () => {
+        document.querySelectorAll('.portal-trigger').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('patientPortalNew').style.display = 'flex';
+            });
+        });
+    });
+  </script>
 
   <!-- Lightbox -->
   <div id="lightbox" class="lightbox">
