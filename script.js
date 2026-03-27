@@ -148,10 +148,12 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...';
 
             try {
-                const searchUrl = `api/reports.php?action=fetch&case_id=${encodeURIComponent(caseId)}&cnic=${encodeURIComponent(password)}`;
-                const res = await fetch(searchUrl);
+                const res = await fetch('api/reports.php?action=fetch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ case_id: caseId, cnic: password })
+                });
                 
-                // If response is not JSON (e.g. 500 error), catch it
                 let data = {};
                 try {
                     data = await res.json();
@@ -160,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (!res.ok) {
-                    const errorMsg = data.error || (res.status === 403 ? "Incorrect Password" : "Report not found (Check Case ID)");
+                    const errorMsg = data.error || "Could not retrieve report.";
                     throw new Error(errorMsg);
                 }
 
