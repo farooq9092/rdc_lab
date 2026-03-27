@@ -148,16 +148,24 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...';
 
             try {
+                console.log("Portal: Attempting fetch for", caseId);
                 const res = await fetch('api/reports.php?action=fetch', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ case_id: caseId, cnic: password })
                 });
 
-                const data = await res.json().catch(() => ({ error: "Invalid response from server" }));
+                const text = await res.text();
+                let data = {};
+                try {
+                    data = JSON.parse(text);
+                } catch(e) {
+                    alert("SERVER ERROR: " + text.substring(0, 50));
+                    throw new Error("Invalid response");
+                }
 
                 if (!res.ok) {
-                    throw new Error(data.error || "Incorrect ID/Password. Check the credentials sent to you.");
+                    throw new Error(data.error || "Incorrect ID/Password.");
                 }
 
                 // SUCCESS: Hide form, show result
