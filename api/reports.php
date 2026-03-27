@@ -1,29 +1,34 @@
 <?php
 require_once 'config.php';
-
 $action = $_GET['action'] ?? '';
 
-// Public - Fetch Report (Using POST for better server compatibility)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'fetch') {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $case_id = trim($data['case_id'] ?? '');
-    $password = trim($data['cnic'] ?? '');
+// 1. Force Clean JSON output
+error_reporting(0);
+ini_set('display_errors', 0);
 
-    if (!$case_id || !$password) {
-        sendJSON(['error' => 'Case ID and Password are required'], 400);
+// Public - Fetch Report (Dual Method Detection)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'fetch') {
+    // 2. Try JSON first, then Form Data
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true);
+    
+    $cid = trim($data['case_id'] ?? ($_POST['case_id'] ?? ''));
+    $pwd = trim($data['cnic'] ?? ($_POST['cnic'] ?? ''));
+
+    if (!$cid || !$pwd) {
+        sendJSON(['error' => 'Case ID and Password required'], 400);
     }
 
     $stmt = $pdo->prepare("SELECT * FROM reports WHERE case_id = ?");
-    $stmt->execute([$case_id]);
+    $stmt->execute([$cid]);
     $report = $stmt->fetch();
 
     if (!$report) {
-        sendJSON(['error' => 'Report not found. Please double-check your Case ID.'], 404);
+        sendJSON(['error' => 'Report not found (Check Case ID)'], 404);
     }
     
-    // Use trim to ensure matching even with accidental database spaces
-    if (trim($report['cnic']) !== $password) {
-        sendJSON(['error' => 'Incorrect Password. Please check the credentials sent to you.'], 403);
+    if (trim($report['cnic']) !== $pwd) {
+        sendJSON(['error' => 'Incorrect Password (Check CNIC)'], 403);
     }
     
     sendJSON($report);
