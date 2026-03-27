@@ -153,43 +153,34 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ case_id: caseId, cnic: password })
                 });
-                
-                let data = {};
-                try {
-                    data = await res.json();
-                } catch(e) {
-                    throw new Error("Server communication error. Please try again later.");
-                }
+
+                const data = await res.json().catch(() => ({ error: "Invalid response from server" }));
 
                 if (!res.ok) {
-                    const errorMsg = data.error || "Could not retrieve report.";
-                    throw new Error(errorMsg);
+                    throw new Error(data.error || "Incorrect ID/Password. Check the credentials sent to you.");
                 }
 
-                if (!data.case_id) throw new Error("Report found but data is incomplete.");
-
+                // SUCCESS: Hide form, show result
                 portalForm.style.display = 'none';
                 resultDiv.style.display = 'block';
                 resultDiv.innerHTML = `
-                    <div style="padding: 20px; text-align: left; border-bottom: 2px solid var(--primary-light);">
-                        <h3 style="color:var(--primary); margin:0;">${data.patient_name}</h3>
-                        <p style="margin:5px 0 0; color:#666;">Case ID: #${data.case_id}</p>
+                    <div style="border-bottom:1px solid #eee; padding-bottom:12px; margin-bottom:15px; text-align:left;">
+                        <h3 style="margin:0; color:var(--primary)">Patient: ${data.patient_name}</h3>
+                        <p style="margin:4px 0 0; color:#666; font-size:0.9rem">Case ID: #${data.case_id}</p>
                     </div>
-                    <div style="padding: 20px;">
-                        <p style="margin:0 0 15px; font-size:1.1rem;">Status: <span style="background:${data.status === 'Final' ? '#d4edda' : '#fff3cd'}; padding:5px 12px; border-radius:20px; font-weight:bold; font-size:0.9rem;">${data.status}</span></p>
-                        ${data.status === 'Final' ? 
-                          `<a href="api/reports.php?action=download&case_id=${encodeURIComponent(caseId)}&cnic=${encodeURIComponent(password)}" class="btn btn-primary" style="width:100%;"><i class="fas fa-download"></i> Download Official PDF Report</a>` : 
-                          `<div style="background:#f8f9fa; padding:15px; border-radius:10px; border-left:4px solid var(--secondary);">
-                              <p style="margin:0; color:#666; font-size:0.9rem;"><strong>Processing:</strong> Your laboratory results are currently undergoing verification. Please check back after 4-6 hours.</p>
-                           </div>`}
-                        <button class="btn" style="margin-top:20px; width:100%; background:#eee; color:#333;" onclick="location.reload()">Return to Search</button>
-                    </div>
+                    <p style="margin-bottom:15px; font-weight:600">Status: <span style="background:${data.status === 'Final' ? '#d4edda' : '#fff3cd'}; padding:4px 10px; border-radius:12px; font-size:0.8rem">${data.status}</span></p>
+                    
+                    ${data.status === 'Final' ? 
+                      `<a href="api/reports.php?action=download&case_id=${encodeURIComponent(caseId)}&cnic=${encodeURIComponent(password)}" class="btn btn-primary" style="display:block; text-align:center; padding:15px;"><i class="fas fa-download"></i> DOWNLOAD OFFICIAL REPORT</a>` :
+                      `<div style="background:#f8f9fa; padding:15px; border-radius:8px; border-left:4px solid #f1c40f; color:#856404; font-size:0.85rem;"><strong>Processing:</strong> Your results are not finalized yet. Please check back later.</div>`}
+
+                    <button class="btn" onclick="location.reload()" style="margin-top:20px; width:100%; height:45px; background:#f0f0f0; color:#333; border:none; border-radius:8px; cursor:pointer; font-weight:600;">NEW SEARCH</button>
                 `;
             } catch (err) {
-                alert(err.message || "Could not retrieve report. Check Case ID/Password.");
+                alert(err.message);
             } finally {
+                btn.innerHTML = originalText;
                 btn.disabled = false;
-                btn.innerHTML = 'Fetch My Report';
             }
         });
     }
