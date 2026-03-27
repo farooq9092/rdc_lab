@@ -44,12 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'download') {
         die("Missing Case ID or Password.");
     }
 
-    $stmt = $pdo->prepare("SELECT * FROM reports WHERE case_id = ? AND cnic = ?");
-    $stmt->execute([$case_id, $password]);
+    $stmt = $pdo->prepare("SELECT * FROM reports WHERE case_id = ?");
+    $stmt->execute([trim($case_id)]);
     $report = $stmt->fetch();
 
-    if (!$report) {
-        die("Invalid Credentials. Please check Case ID and Password (CNIC).");
+    if (!$report || trim($report['cnic']) !== trim($password)) {
+        die("Invalid Credentials. Please check Case ID and Password (CNIC) exactly as sent to you.");
     }
 
     if (empty($report['file_path'])) {
