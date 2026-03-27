@@ -1,15 +1,29 @@
 <?php
-// Database configuration
-// Replace with your actual Hostinger HPanel details
+// 1. Force Error Display for Debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// 2. Initialize Session at the absolute top
+if (session_status() === PHP_SESSION_NONE) {
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.use_only_cookies', 1);
+    ini_set('session.cookie_samesite', 'Lax');
+    if (isset($_SERVER['SERVER_NAME'])) {
+        ini_set('session.cookie_domain', $_SERVER['SERVER_NAME']);
+    }
+    session_start();
+}
+
+// 3. Database configuration (Hostinger)
 $host = 'localhost';
-$db = 'u932844992_rdc'; // Your Database Name
-$user = 'u932844992_rdclab'; // Your Database Username
-$pass = 'farooq@Domain1'; // Your Database Password
+$db = 'u932844992_rdc'; 
+$user = 'u932844992_rdclab'; 
+$pass = 'farooq@Domain1'; 
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 $options = [
-    PDO::ATTR_ERR_MODE => PDO::ERR_MODE_EXCEPTION,
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     PDO::ATTR_EMULATE_PREPARES => false,
 ];
@@ -18,10 +32,8 @@ try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 }
 catch (\PDOException $e) {
-    // For production, you might want a more subtle error
-    // die("Connection failed: " . $e->getMessage());
     header("HTTP/1.1 500 Internal Server Error");
-    echo json_encode(['error' => 'Database connection failed. Please check api/config.php']);
+    echo json_encode(['error' => 'DB Connection Failed: ' . $e->getMessage()]);
     exit;
 }
 
@@ -34,18 +46,6 @@ function sendJSON($data, $status = 200)
     }
     echo json_encode($data);
     exit;
-}
-
-// Robust Session Initialization for Hostinger
-if (session_status() === PHP_SESSION_NONE) {
-    ini_set('session.cookie_httponly', 1);
-    ini_set('session.use_only_cookies', 1);
-    ini_set('session.cookie_samesite', 'Lax');
-    // Ensure domain consistency
-    if (isset($_SERVER['SERVER_NAME'])) {
-        ini_set('session.cookie_domain', $_SERVER['SERVER_NAME']);
-    }
-    session_start();
 }
 
 function isAdmin()
