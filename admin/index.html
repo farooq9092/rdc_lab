@@ -127,28 +127,18 @@
             <h2>Issue New Laboratory Report</h2>
             <p style="margin-bottom: 20px; color: var(--text-muted);">Enter patient details and upload the report file. <strong>The CNIC field is now used as the Patient Password.</strong></p>
             <form id="reportForm" style="background: white; padding: 30px; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; box-shadow: var(--shadow-sm);">
-                <div class="form-group"><label>Case ID (e.g. 12345)</label><input type="text" id="repCaseId" required></div>
-                <div class="form-group"><label>Patient Password (CNIC)</label><input type="text" id="repCnic" required placeholder="Create a password"></div>
+                <div class="form-group"><label>Case Number (e.g. 12345)</label><input type="text" id="repCaseId" required></div>
+                <div class="form-group"><label>Patient Password (Secure Access)</label><input type="text" id="repCnic" required placeholder="Create a secure password"></div>
                 <div class="form-group"><label>Patient Name</label><input type="text" id="repName" required></div>
-                <div class="form-group"><label>Patient Phone Number</label><input type="tel" id="repPhone" required placeholder="03xxxxxxxxx"></div>
+                <div class="form-group"><label>Patient Phone Number</label><input type="tel" id="repPhone" required placeholder="e.g. 03136811565"></div>
                 
-                <div class="form-group"><label>Test Name</label><input type="text" id="repTestName" required placeholder="e.g. Renal Profile"></div>
-                <div class="form-group"><label>Gender</label>
-                    <select id="repGender">
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>Age</label><input type="text" id="repAge" placeholder="e.g. 45Y"></div>
+                <div class="form-group"><label>Report File (PDF, Image, Doc)</label><input type="file" id="repFile" accept=".pdf,.doc,.docx,.jpg,.png,.jpeg" required></div>
                 <div class="form-group"><label>Report Status</label>
                     <select id="repStatus">
                         <option value="Final">Final - Visible to Patient</option>
                         <option value="Pending">Pending - Hidden from Patient</option>
                     </select>
                 </div>
-                
-                <div class="form-group" style="grid-column: span 2;"><label>Report File (PDF, Image)</label><input type="file" id="repFile" accept=".pdf,.jpg,.png,.jpeg" required></div>
                 <div style="grid-column: span 2; padding-top: 10px;">
                     <button type="submit" class="btn btn-primary" style="width: 250px;"><i class="fas fa-file-export"></i> Upload & Publish Report</button>
                 </div>
@@ -258,16 +248,24 @@
             const thisMonth = today.substring(0, 7);
             let bDaily = 0, bMonthly = 0, rDaily = 0, rMonthly = 0;
             
-            bookingsData.forEach(b => {
-                const bDate = b.created_at.split(' ')[0];
-                if (bDate === today) bDaily++;
-                if (bDate.startsWith(thisMonth)) bMonthly++;
-            });
-            reportsData.forEach(r => {
-                const rDate = r.created_at.split(' ')[0];
-                if (rDate === today) rDaily++;
-                if (rDate.startsWith(thisMonth)) rMonthly++;
-            });
+            if (Array.isArray(bookingsData)) {
+                bookingsData.forEach(b => {
+                    if (b.created_at) {
+                        const bDate = b.created_at.split(' ')[0];
+                        if (bDate === today) bDaily++;
+                        if (bDate.startsWith(thisMonth)) bMonthly++;
+                    }
+                });
+            }
+            if (Array.isArray(reportsData)) {
+                reportsData.forEach(r => {
+                    if (r.created_at) {
+                        const rDate = r.created_at.split(' ')[0];
+                        if (rDate === today) rDaily++;
+                        if (rDate.startsWith(thisMonth)) rMonthly++;
+                    }
+                });
+            }
             updateCharts(bDaily, bMonthly, rDaily, rMonthly);
         }
 
@@ -539,9 +537,6 @@
                 formData.append('cnic', document.getElementById('repCnic').value);
                 formData.append('patient_name', document.getElementById('repName').value);
                 formData.append('patient_phone', document.getElementById('repPhone').value);
-                formData.append('test_name', document.getElementById('repTestName').value);
-                formData.append('gender', document.getElementById('repGender').value);
-                formData.append('age', document.getElementById('repAge').value);
                 formData.append('status', document.getElementById('repStatus').value);
                 
                 const fileInput = document.getElementById('repFile');
