@@ -14,26 +14,17 @@ try {
     )");
     echo "<p class='success'>✅ Users table verified.</p>";
 
-    // 2. Reports Table (Enhanced with clinical fields)
+    // 2. Reports Table (Stable Production Schema)
     $pdo->exec("CREATE TABLE IF NOT EXISTS reports (
         case_id VARCHAR(50) PRIMARY KEY,
         cnic VARCHAR(20) NOT NULL,
         patient_name VARCHAR(100) NOT NULL,
         patient_phone VARCHAR(20),
-        test_name VARCHAR(100),
-        gender VARCHAR(10),
-        age VARCHAR(10),
         status VARCHAR(20) DEFAULT 'Pending',
         file_path VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
-    
-    // Migration: Add missing columns if table already existed
-    try { $pdo->exec("ALTER TABLE reports ADD COLUMN IF NOT EXISTS test_name VARCHAR(100)"); } catch(Exception $e){}
-    try { $pdo->exec("ALTER TABLE reports ADD COLUMN IF NOT EXISTS gender VARCHAR(10)"); } catch(Exception $e){}
-    try { $pdo->exec("ALTER TABLE reports ADD COLUMN IF NOT EXISTS age VARCHAR(10)"); } catch(Exception $e){}
-    
-    echo "<p class='success'>✅ Reports table (Enhanced) verified.</p>";
+    echo "<p class='success'>✅ Reports table (Stable) verified.</p>";
 
     // 3. Bookings Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS bookings (

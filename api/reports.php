@@ -26,25 +26,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'fetch') {
 // Public - Download Report
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'download') {
     $case_id = $_GET['case_id'] ?? '';
-    $password = $_GET['cnic'] ?? '';
+    // Use 'cnic' or 'password' parameter for maximum compatibility
+    $password = $_GET['cnic'] ?? ($_GET['password'] ?? '');
+
+    if (!$case_id || !$password) {
+        die("Missing Case ID or Password.");
+    }
 
     $stmt = $pdo->prepare("SELECT * FROM reports WHERE case_id = ? AND cnic = ?");
     $stmt->execute([$case_id, $password]);
     $report = $stmt->fetch();
 
-    if ($report && !empty($report['file_path'])) {
-        $fullPath = '../' . $report['file_path'];
-        if (file_exists($fullPath)) {
-            $ext = pathinfo($fullPath, PATHINFO_EXTENSION);
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="Report_' . $case_id . '.' . $ext . '"');
-            readfile($fullPath);
-            exit;
-        }
+    if (!$report) {
+        die("Invalid Credentials. Please check Case ID and Password (CNIC).");
     }
-    header("HTTP/1.1 404 Not Found");
-    echo "Report file not found or Unauthorized";
-    exit;
+
+    if (empty($report['file_path'])) {
+        die("This report record does not have an attached file.");
+    }
+
+    $fullPath = '../' . $report['file_path'];
+    
+    if (file_exists($fullPath) && is_file($fullPath)) {
+        $ext = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+        $filename = "Report_" . preg_replace("/[^a-zA-Z0-9]/", "_", $case_id) . "." . $ext;
+        
+        // Clear any previous output
+        if (ob_get_level()) ob_end_clean();
+        
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($fullPath));
+        readfile($fullPath);
+        exit;
+    } else {
+        die("Physical file not found on server at: " . $fullPath);
+    }
 }
 
 // Admin - List Reports
@@ -75,12 +96,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'upload') {
     adminOnly();
     
     $case_id = $_POST['case_id'];
-    $password = $_POST['cnic']; // Using 'cnic' field in DB for the password
+    $password = $_POST['cnic']; // Used as Patient Password
     $patient_name = $_POST['patient_name'];
     $patient_phone = $_POST['patient_phone'] ?? '';
-    $test_name = $_POST['test_name'] ?? 'Diagnostic Test';
-    $gender = $_POST['gender'] ?? '';
-    $age = $_POST['age'] ?? '';
     $status = $_POST['status'];
 
     if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
@@ -102,13 +120,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'upload') {
     $targetPath = $uploadDir . $safeName;
 
     if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-        $stmt = $pdo->prepare("INSERT INTO reports (case_id, cnic, patient_name, patient_phone, test_name, gender, age, status, file_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO reports (case_id, cnic, patient_name, patient_phone, status, file_path) VALUES (?, ?, ?, ?, ?, ?)");
         try {
-            $stmt->execute([$case_id, $password, $patient_name, $patient_phone, $test_name, $gender, $age, $status, 'uploads/' . $safeName]);
+            $stmt->execute([$case_id, $password, $patient_name, $patient_phone, $status, 'uploads/' . $safeName]);
             sendJSON(['message' => 'Success', 'notified' => $patient_phone]);
         } catch (Exception $e) {
             unlink($targetPath); // Delete file if DB fails
-            sendJSON(['error' => 'Case ID already exists or DB Error: ' . $e->getMessage()], 400);
+            sendJSON(['error' => 'Case ID already exists or DB Error'], 400);
         }
     } else {
         sendJSON(['error' => 'Failed to save file'], 500);
