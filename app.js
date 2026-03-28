@@ -1,0 +1,586 @@
+// --- Global Interactions ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Reveal Observer
+    const revealOptions = { threshold: 0.15 };
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, revealOptions);
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // FAQ Toggle
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        if (question) {
+            question.addEventListener('click', () => {
+                faqItems.forEach(faq => {
+                    if (faq !== item) faq.classList.remove('active');
+                });
+                item.classList.toggle('active');
+            });
+        }
+    });
+
+    // Sticky Header
+    const header = document.querySelector('.header');
+    window.addEventListener('scroll', () => {
+        if (!header) return;
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+
+    // Mobile Menu
+    const menuToggle = document.querySelector('.menu-toggle');
+    const mobileNav = document.getElementById('mobileNav');
+    const overlay = document.getElementById('overlay');
+
+    const toggleMenu = () => {
+        if (!mobileNav || !overlay) return;
+        mobileNav.classList.toggle('open');
+        overlay.classList.toggle('open');
+        document.body.style.overflow = mobileNav.classList.contains('open') ? 'hidden' : 'auto';
+    };
+
+    if(menuToggle && mobileNav) {
+        menuToggle.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+        document.querySelectorAll('.mobile-nav-links a').forEach(link => {
+            link.addEventListener('click', toggleMenu);
+        });
+    }
+
+    // Star Rating Interactivity
+    const stars = document.querySelectorAll('#starRating i');
+    const ratingInput = document.getElementById('ratingInput');
+
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const rating = star.getAttribute('data-rating');
+            ratingInput.value = rating;
+            stars.forEach(s => {
+                const sPos = s.getAttribute('data-rating');
+                if (parseInt(sPos) <= parseInt(rating)) {
+                    s.classList.remove('far');
+                    s.classList.add('fas', 'active');
+                } else {
+                    s.classList.remove('fas', 'active');
+                    s.classList.add('far');
+                }
+            });
+        });
+    });
+
+    // Feedback Submission
+    const feedbackForm = document.getElementById('feedbackForm');
+    if (feedbackForm && ratingInput) {
+        feedbackForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = feedbackForm.querySelector('button');
+            const name = feedbackForm.querySelector('input[type="text"]').value;
+            const comment = feedbackForm.querySelector('textarea').value;
+            const rating = ratingInput.value;
+
+            if (rating === "0" || !rating) {
+                alert("Please select a star rating!");
+                return;
+            }
+
+            btn.disabled = true;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+            try {
+                const res = await fetch('api/feedback.php?action=submit', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ name, comment, rating })
+                });
+                if (res.ok) {
+                    feedbackForm.innerHTML = `
+                        <div style="text-align:center; padding:40px; color:var(--primary);">
+                            <i class="fas fa-check-circle" style="font-size:3rem; margin-bottom:15px;"></i>
+                            <h3>Thank You!</h3>
+                            <p>Your feedback has been submitted for review.</p>
+                        </div>`;
+                } else {
+                    alert("Error submitting feedback. Please try again.");
+                }
+            } catch (err) { 
+                alert("Submission failed. Check your connection."); 
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+    }
+
+    // Portal Modal Logic
+    const portalModal = document.getElementById('patientPortal');
+    
+    // Auto-identify triggers by text as fallback
+    document.querySelectorAll('.btn').forEach(btn => {
+        if (btn.innerText.includes('Download') || btn.innerText.includes('Report')) {
+            btn.classList.add('portal-trigger');
+        }
+    });
+
+    const portalTriggers = document.querySelectorAll('.portal-trigger');
+    portalTriggers.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (portalModal) portalModal.classList.add('active');
+        });
+    });
+
+    if(portalModal) {
+        const closeBtn = portalModal.querySelector('.close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                portalModal.classList.remove('active');
+            });
+        }
+    }
+
+    // Portal Form Submission
+    const portalForm = document.getElementById('portalForm');
+    if (portalForm) {
+        portalForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const caseId = document.getElementById('caseId').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('reportResult');
+            const btn = portalForm.querySelector('button');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...';
+
+            try {
+                console.log("Portal: Attempting fetch for", caseId);
+                const res = await fetch('api/reports.php?action=fetch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ case_id: caseId, cnic: password })
+                });
+
+                const text = await res.text();
+                let data = {};
+                try {
+                    data = JSON.parse(text);
+                } catch(e) {
+                    alert("SERVER ERROR: " + text.substring(0, 50));
+                    throw new Error("Invalid response");
+                }
+
+                if (!res.ok) {
+                    throw new Error(data.error || "Incorrect ID/Password.");
+                }
+
+                // SUCCESS: Hide form, show result
+                portalForm.style.display = 'none';
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    <div style="border-bottom:1px solid #eee; padding-bottom:12px; margin-bottom:15px; text-align:left;">
+                        <h3 style="margin:0; color:var(--primary)">Patient: ${data.patient_name}</h3>
+                        <p style="margin:4px 0 0; color:#666; font-size:0.9rem">Case ID: #${data.case_id}</p>
+                    </div>
+                    <p style="margin-bottom:15px; font-weight:600">Status: <span style="background:${data.status === 'Final' ? '#d4edda' : '#fff3cd'}; padding:4px 10px; border-radius:12px; font-size:0.8rem">${data.status}</span></p>
+                    
+                    ${data.status === 'Final' ? 
+                      `<a href="api/reports.php?action=download&case_id=${encodeURIComponent(caseId)}&cnic=${encodeURIComponent(password)}" class="btn btn-primary" style="display:block; text-align:center; padding:15px;"><i class="fas fa-download"></i> DOWNLOAD OFFICIAL REPORT</a>` :
+                      `<div style="background:#f8f9fa; padding:15px; border-radius:8px; border-left:4px solid #f1c40f; color:#856404; font-size:0.85rem;"><strong>Processing:</strong> Your results are not finalized yet. Please check back later.</div>`}
+
+                    <button class="btn" onclick="location.reload()" style="margin-top:20px; width:100%; height:45px; background:#f0f0f0; color:#333; border:none; border-radius:8px; cursor:pointer; font-weight:600;">NEW SEARCH</button>
+                `;
+            } catch (err) {
+                alert(err.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    }
+
+    // Booking Form Submission
+    const bookingForm = document.getElementById('bookingForm');
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = bookingForm.querySelector('button');
+            const name = bookingForm.querySelector('input[type="text"]').value;
+            const phone = bookingForm.querySelector('input[type="tel"]').value;
+            const packageValue = document.getElementById('pkgSelect').value;
+            const address = bookingForm.querySelector('textarea').value;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            try {
+                const res = await fetch('api/bookings.php?action=submit', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ name, phone, package: packageValue, address })
+                });
+                if (res.ok) {
+                    bookingForm.innerHTML = `
+                        <div style="text-align:center; padding:30px; background:#f0f7ff; border-radius:15px; border:2px dashed var(--primary);">
+                            <i class="fas fa-check-circle" style="font-size:3rem; color:var(--primary); margin-bottom:15px;"></i>
+                            <h3>Request Received!</h3>
+                            <p>Our team will contact you within 15 minutes to confirm your home sampling.</p>
+                        </div>`;
+                } else {
+                    alert("Error submitting booking. Please try again.");
+                }
+            } catch (err) { alert("Network error. Please call us directly."); }
+            finally { 
+                btn.disabled = false; 
+                btn.innerHTML = 'Request Sample Collection';
+            }
+        });
+    }
+
+    // Test Search Functionality
+    const testSearchInput = document.getElementById('testSearchInput');
+    const testResults = document.getElementById('testResults');
+    const testDatabase = [
+        { name: "Complete Blood Count (CBC)", price: "800", time: "Same Day" },
+        { name: "Blood Sugar Fasting (BSF)", price: "250", time: "Same Day" },
+        { name: "Blood Sugar Random (BSR)", price: "250", time: "Same Day" },
+        { name: "Lipid Profile", price: "1800", time: "Same Day" },
+        { name: "Liver Function Tests (LFTs)", price: "1200", time: "Same Day" },
+        { name: "Renal Function Tests (RFTs)", price: "1400", time: "Same Day" },
+        { name: "Thyroid Profile (T3, T4, TSH)", price: "2500", time: "Same Day" },
+        { name: "Vitamin D3", price: "2800", time: "24 Hours" },
+        { name: "HbA1c", price: "1200", time: "Same Day" },
+        { name: "Uric Acid", price: "400", time: "Same Day" },
+        { name: "Urine Routine Examination", price: "300", time: "Same Day" },
+        { name: "Serum Calcium", price: "450", time: "Same Day" },
+        { name: "Hepatitis B Surface Antigen (HBsAg)", price: "600", time: "Same Day" },
+        { name: "Anti HCV", price: "800", time: "Same Day" },
+        { name: "C-Reactive Protein (CRP)", price: "900", time: "Same Day" },
+        { name: "Widal Test", price: "600", time: "Same Day" },
+        { name: "Typhidot", price: "1000", time: "Same Day" },
+        { name: "Dengue NS1 Antigen", price: "1500", time: "Same Day" },
+        { name: "Malaria Parasite (MP)", price: "300", time: "Same Day" },
+        { name: "Serum Electrolytes", price: "1000", time: "Same Day" },
+        { name: "25-Hydroxy Vitamin-D", price: "3100", time: "24 Hours" },
+        { name: "75g Glucose Single format (GTT)", price: "1200", time: "Same Day" },
+        { name: "Albumin (Serum)", price: "400", time: "Same Day" },
+        { name: "Alkaline Phosphatase (ALP)", price: "300", time: "Same Day" },
+        { name: "Alpha Fetoprotein (AFP)", price: "1500", time: "Same Day" },
+        { name: "AMH", price: "6000", time: "24 Hours" },
+        { name: "Amylase Serum", price: "1400", time: "Same Day" },
+        { name: "ANA (ELISA)", price: "3000", time: "24 Hours" },
+        { name: "Angiotensin Converting Enzyme", price: "5000", time: "24 Hours" },
+        { name: "Anti Cyclic Citrullinated Peptide", price: "2200", time: "24 Hours" },
+        { name: "Anti-ds DNA", price: "3000", time: "24 Hours" },
+        { name: "Anti Erythropoietin Proteins", price: "4000", time: "24 Hours" },
+        { name: "Anti HBe (HBeAb)", price: "3000", time: "24 Hours" },
+        { name: "Anti HIV 1&2 ELISA", price: "2200", time: "Same Day" },
+        { name: "Anti Nuclear Antibodies (ANA)", price: "7500", time: "24 Hours" },
+        { name: "Anti Tissue Transglutaminase lgA", price: "3000", time: "24 Hours" },
+        { name: "Anti Tissue Transglutaminase lgG", price: "3000", time: "24 Hours" },
+        { name: "Beta HCG", price: "1200", time: "Same Day" },
+        { name: "Bicarbonate (HCO3)", price: "800", time: "Same Day" },
+        { name: "Bilirubin Direct", price: "500", time: "Same Day" },
+        { name: "Bilirubin (Direct/Indirect)", price: "800", time: "Same Day" },
+        { name: "Bilirubin Indirect", price: "500", time: "Same Day" },
+        { name: "BIOPSY LARGE", price: "3000", time: "3 Days" },
+        { name: "BIOPSY MEDIUM FOR HP", price: "2000", time: "3 Days" },
+        { name: "Blood Culture", price: "2000", time: "3 Days" },
+        { name: "Blood Glucose After Lunch", price: "300", time: "Same Day" },
+        { name: "Blood Glucose Before Dinner", price: "300", time: "Same Day" },
+        { name: "Blood Glucose (sugar) Fasting", price: "300", time: "Same Day" },
+        { name: "Blood Glucose (sugar) Rando", price: "300", time: "Same Day" },
+        { name: "Blood Group & RH Factor", price: "300", time: "Same Day" },
+        { name: "Blood Urea Nitrogen (BUN)", price: "400", time: "Same Day" },
+        { name: "Breast Milk for C/S", price: "400", time: "Same Day" },
+        { name: "Brucella Antibody", price: "3000", time: "Same Day" },
+        { name: "C3 & C4 Level", price: "5000", time: "24 Hours" },
+        { name: "CA-125", price: "4000", time: "24 Hours" },
+        { name: "CA 15-3", price: "4500", time: "24 Hours" },
+        { name: "Calcium Serum", price: "300", time: "Same Day" },
+        { name: "Carcinoembryonic Antigen CEA", price: "2200", time: "24 Hours" },
+        { name: "Cardiac Enzymes", price: "2500", time: "Same Day" },
+        { name: "CBC FOR DENGUE", price: "500", time: "Same Day" },
+        { name: "CBC with PERIPHERAL FILM (MP)", price: "2000", time: "Same Day" },
+        { name: "Ceruloplasmin Serum", price: "2200", time: "24 Hours" },
+        { name: "Chloride (Serum)", price: "400", time: "Same Day" },
+        { name: "Cholesterol", price: "400", time: "Same Day" },
+        { name: "CK-MB", price: "1200", time: "Same Day" },
+        { name: "Clotting Time", price: "800", time: "Same Day" },
+        { name: "Coombs Direct", price: "1500", time: "Same Day" },
+        { name: "Coombs Direct/Indirect (Both)", price: "2500", time: "Same Day" },
+        { name: "Copper", price: "2000", time: "24 Hours" },
+        { name: "CORTISOL AM MORNING", price: "2800", time: "24 Hours" },
+        { name: "Cortisol (Serum)", price: "2800", time: "24 Hours" },
+        { name: "CPK MB", price: "800", time: "Same Day" },
+        { name: "C-Peptide Level", price: "5000", time: "24 Hours" },
+        { name: "C-Reactive Protein (CRP)", price: "1300", time: "Same Day" },
+        { name: "Creatinine Serum", price: "400", time: "Same Day" },
+        { name: "CSF Complete Examination", price: "1200", time: "Same Day" },
+        { name: "CSF LDH", price: "800", time: "Same Day" },
+        { name: "D-Dimer Test", price: "3000", time: "Same Day" },
+        { name: "Dehydroepiandrosterone Sulphate", price: "2200", time: "24 Hours" },
+        { name: "Dengue IgG IgM", price: "800", time: "Same Day" },
+        { name: "DIALYSIS PROFILE", price: "10000", time: "24 Hours" },
+        { name: "Electrolytes (Na, Cl)", price: "1400", time: "Same Day" },
+        { name: "ENA PROFILE", price: "8200", time: "24 Hours" },
+        { name: "Erythrocyte sedimentation rate", price: "400", time: "Same Day" },
+        { name: "Estradiol / Serum (E2)", price: "1800", time: "24 Hours" },
+        { name: "Ferritin Level", price: "1200", time: "24 Hours" },
+        { name: "DOPPLER ULTRASOUND", price: "5000", time: "Same Day" },
+        { name: "Fluid Complete Examination ()", price: "5000", time: "Same Day" },
+        { name: "FNAC (FINE NEEDLE ASPIRATION)", price: "4000", time: "Same Day" },
+        { name: "Folate Level (Folic Acid)", price: "4500", time: "24 Hours" },
+        { name: "[Free] (FT3, FT4, TSH) THYROID", price: "4500", time: "24 Hours" },
+        { name: "Free T-3 (Free Tri-iodothyron)", price: "1000", time: "24 Hours" },
+        { name: "Free T-4 (Free Thyroxine)", price: "1000", time: "24 Hours" },
+        { name: "FSH", price: "2000", time: "24 Hours" },
+        { name: "GGT", price: "400", time: "Same Day" },
+        { name: "Growth Hormone (GH)", price: "2800", time: "24 Hours" },
+        { name: "HAV lgM", price: "2000", time: "Same Day" },
+        { name: "HbA1C (Glycosylated Hemoglob)", price: "1100", time: "Same Day" },
+        { name: "Hb Electrophoresis", price: "2500", time: "24 Hours" },
+        { name: "Hb (Hemoglobin)", price: "200", time: "Same Day" },
+        { name: "HBsAb (Hepatitis B Surface Anti)", price: "5000", time: "Same Day" },
+        { name: "HCV RNA PCR Quantitative", price: "12000", time: "3 Days" },
+        { name: "HEV lgM", price: "2000", time: "Same Day" },
+        { name: "HEV lgG", price: "2000", time: "Same Day" },
+        { name: "Helicobacter Pylori lgM", price: "3000", time: "Same Day" },
+        { name: "Helicobacter Pylori lgG", price: "3000", time: "Same Day" },
+        { name: "Hepatitis A Virus lgM (HAV lgM)", price: "3000", time: "Same Day" },
+        { name: "Hepatitis B Core Antibody(HBcAr)", price: "6000", time: "24 Hours" },
+        { name: "Hepatitis B e Antigen (HBeAg)", price: "5000", time: "Same Day" },
+        { name: "Hepatitis B Surface Antigen (HBs)", price: "2000", time: "Same Day" },
+        { name: "Hepatitis C Virus (HCV) RNA QUA", price: "12000", time: "3 Days" },
+        { name: "Hepatitis C Virus (HCV) lgG lgM", price: "1500", time: "Same Day" },
+        { name: "Hepatitis E Virus (HEV) IgM", price: "2500", time: "Same Day" },
+        { name: "Hepatitis E Virus lgG (HEV)", price: "2500", time: "Same Day" },
+        { name: "HIV 1 RNA PCR QUANTITATIVE", price: "19000", time: "3 Days" },
+        { name: "HIV SCREENING ICT", price: "500", time: "Same Day" },
+        { name: "Homocysteine Level", price: "5500", time: "24 Hours" },
+        { name: "HSV lgG Antibody", price: "2200", time: "Same Day" },
+        { name: "HVS Culture", price: "1100", time: "3 Days" },
+        { name: "IgE", price: "1200", time: "24 Hours" },
+        { name: "IMMUNOGLOBULIN IGM (HBcAb)", price: "2500", time: "24 Hours" },
+        { name: "IRON BINDING CAPACITY", price: "1200", time: "Same Day" },
+        { name: "LFTs (Liver Function Test)", price: "1400", time: "Same Day" },
+        { name: "Lipase", price: "2400", time: "Same Day" },
+        { name: "Lipid Profile", price: "1800", time: "Same Day" },
+        { name: "Magnesium Serum", price: "700", time: "Same Day" },
+        { name: "Malaria Parasite (ICT) MP", price: "700", time: "Same Day" },
+        { name: "Malaria Parasite MP Slide", price: "400", time: "Same Day" },
+        { name: "Phosphorus Serum", price: "400", time: "Same Day" },
+        { name: "Platelet Count", price: "400", time: "Same Day" },
+        { name: "PLEURAL FLUID R/E", price: "2000", time: "Same Day" },
+        { name: "Potassium (Serum)", price: "400", time: "Same Day" },
+        { name: "Pregnancy Test", price: "400", time: "Same Day" },
+        { name: "Prolactin Serum", price: "1500", time: "24 Hours" },
+        { name: "Prostate Specific Antigen (PSA)", price: "2200", time: "24 Hours" },
+        { name: "PROTEIN ELECTROPHORESIS", price: "8200", time: "3 Days" },
+        { name: "PT with INR (Prothrombin Time)", price: "700", time: "Same Day" },
+        { name: "Pus Culture", price: "1200", time: "3 Days" },
+        { name: "QuantiFERON TB (IGRA) GOLD", price: "10000", time: "3 Days" },
+        { name: "RA Factor (Qualitative)", price: "1600", time: "Same Day" },
+        { name: "RFTs (Renal Function Tests) Ex", price: "1200", time: "Same Day" },
+        { name: "Rubella IgG/IgM", price: "2200", time: "Same Day" },
+        { name: "Semen Analysis", price: "1000", time: "Same Day" },
+        { name: "Semen Culture Report", price: "1200", time: "3 Days" },
+        { name: "SERUM ANA", price: "2200", time: "24 Hours" },
+        { name: "Serum Insulin", price: "2500", time: "24 Hours" },
+        { name: "SERUM P-ANCA", price: "4500", time: "24 Hours" },
+        { name: "SGOT (AST)", price: "500", time: "Same Day" },
+        { name: "SGPT (ALT)", price: "500", time: "Same Day" },
+        { name: "SPUTUM FOR AFB", price: "2000", time: "3 Days" },
+        { name: "Stone Analysis", price: "2500", time: "3 Days" },
+        { name: "Stool Complete Examination", price: "700", time: "Same Day" },
+        { name: "Stool Culture", price: "1500", time: "3 Days" },
+        { name: "Stool for H.Pylori Antigen", price: "1100", time: "Same Day" },
+        { name: "Stool for Occult Blood", price: "1200", time: "Same Day" },
+        { name: "T3 (Tri-Iodothyronine)", price: "1500", time: "24 Hours" },
+        { name: "T4 (Thyroxine)", price: "1500", time: "24 Hours" },
+        { name: "Testosterone", price: "1500", time: "24 Hours" },
+        { name: "Thyroid Function Test (TFT) (T3,", price: "4000", time: "24 Hours" },
+        { name: "Total Bilirubin", price: "400", time: "Same Day" },
+        { name: "Treponema Pallidum Hemagg", price: "4000", time: "24 Hours" },
+        { name: "Triglycerides TG (Serum)", price: "400", time: "Same Day" },
+        { name: "Trop-I", price: "2200", time: "Same Day" },
+        { name: "TSH (Thyroid Stimulating Horm)", price: "1400", time: "24 Hours" },
+        { name: "UREA (Serum)", price: "400", time: "Same Day" },
+        { name: "Uric acid(UA)", price: "400", time: "Same Day" },
+        { name: "URINE C/E", price: "1000", time: "Same Day" },
+        { name: "USG ABDOMEN", price: "1500", time: "Same Day" },
+        { name: "VDRL", price: "1200", time: "Same Day" },
+        { name: "Vitamin B-12", price: "5000", time: "24 Hours" }
+    ];
+
+    const pkgSelect = document.getElementById('pkgSelect');
+    if (pkgSelect) {
+        const optGroup = document.createElement('optgroup');
+        optGroup.label = "Individual Tests";
+        testDatabase.forEach((test, idx) => {
+            // Append all to dropdown so user can pick
+            const opt = document.createElement('option');
+            opt.value = test.name;
+            opt.textContent = `${test.name} (Rs. ${test.price})`;
+            optGroup.appendChild(opt);
+        });
+        pkgSelect.appendChild(optGroup);
+    }
+
+    if (testSearchInput && testResults) {
+        testSearchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            if (query.length < 2) {
+                testResults.innerHTML = '<div class="mock-result-text">Start typing to find medical tests...</div>';
+                return;
+            }
+
+            const filtered = testDatabase.filter(t => t.name.toLowerCase().includes(query));
+            
+            if (filtered.length === 0) {
+                testResults.innerHTML = '<div class="mock-result-text" style="color:#e74c3c">No tests found matching your search. Please call us for details.</div>';
+                return;
+            }
+
+            testResults.innerHTML = filtered.map(t => `
+                <div class="test-item" style="background:#fff; padding:15px; border-radius:10px; border-left:4px solid var(--primary); margin-bottom:10px; box-shadow:0 2px 10px rgba(0,0,0,0.05); display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <h4 style="margin:0; color:var(--secondary); font-size:1.1rem;">${t.name}</h4>
+                        <span style="font-size:0.8rem; color:#666;"><i class="far fa-clock"></i> Report: ${t.time}</span>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="display:block; font-weight:700; color:var(--primary); font-size:1.2rem;">Rs. ${t.price}</span>
+                        <button onclick="document.getElementById('contact').scrollIntoView();" style="background:none; border:none; color:var(--secondary); font-size:0.8rem; cursor:pointer; text-decoration:underline;">Book Now</button>
+                    </div>
+                </div>
+            `).join('');
+        });
+    }
+
+    // Initial Load
+    loadPublicGallery();
+    loadPublicFeedback();
+});
+
+// --- Dynamic Content Loading ---
+async function loadPublicGallery() {
+    const grid = document.getElementById('galleryGrid');
+    if (!grid) return;
+    try {
+        const res = await fetch('api/gallery.php?action=list');
+        const data = await res.json();
+        if (data.length === 0) {
+            grid.innerHTML = '<div class="mock-result-text">Our events gallery will be updated soon!</div>';
+            return;
+        }
+        grid.innerHTML = data.map(item => `
+            <div class="gallery-item" onclick="openLightbox('${item.url}')">
+                <img src="${item.url}" alt="${item.title}">
+                <div class="gallery-overlay"><i class="fas fa-search-plus"></i></div>
+            </div>
+        `).join('');
+    } catch (err) {
+        grid.innerHTML = '<div class="mock-result-text">Gallery coming soon.</div>';
+    }
+}
+
+async function loadPublicFeedback() {
+    const grid = document.getElementById('feedbackGrid');
+    if (!grid) return;
+    try {
+        const res = await fetch('api/feedback.php?action=list');
+        const data = await res.json();
+        const approved = data.filter(f => f.status === 'Approved');
+        if (approved.length === 0) {
+            const container = document.querySelector('.testimonial-slider-container');
+            if (container) container.style.display = 'none';
+            return;
+        }
+        grid.innerHTML = approved.map(f => `
+            <div class="testimonial-card">
+                <div class="stars">${'★'.repeat(f.rating)}${'☆'.repeat(5-f.rating)}</div>
+                <p>"${f.comment}"</p>
+                <div class="client-info">
+                    <span class="client-name">${f.name}</span>
+                    <span class="verified-tag"><i class="fas fa-check-circle"></i> Verified Patient</span>
+                </div>
+            </div>
+        `).join('');
+        
+        initTestimonialSlider();
+    } catch (err) {
+        console.error("Feedback load failed");
+    }
+}
+
+function initTestimonialSlider() {
+    const track = document.getElementById('feedbackGrid');
+    const slides = Array.from(track.children);
+    const dotsNav = document.getElementById('sliderDots');
+    const nextBtn = document.querySelector('.next-btn');
+    const prevBtn = document.querySelector('.prev-btn');
+
+    if (!track || slides.length === 0) return;
+
+    if (slides.length <= 1) {
+        if (nextBtn) nextBtn.style.display = 'none';
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (dotsNav) dotsNav.style.display = 'none';
+        track.style.justifyContent = 'center';
+        return;
+    }
+
+    let currentIndex = 0;
+    if (dotsNav) {
+        dotsNav.innerHTML = '';
+        slides.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => moveToSlide(i));
+            dotsNav.appendChild(dot);
+        });
+    }
+
+    const moveToSlide = (index) => {
+        track.style.transform = `translateX(-${index * 100}%)`;
+        if (dotsNav) {
+            const dots = Array.from(dotsNav.children);
+            dots.forEach(d => d.classList.remove('active'));
+            dots[index].classList.add('active');
+        }
+        currentIndex = index;
+    };
+
+    if (nextBtn) nextBtn.addEventListener('click', () => moveToSlide((currentIndex + 1) % slides.length));
+    if (prevBtn) prevBtn.addEventListener('click', () => moveToSlide((currentIndex - 1 + slides.length) % slides.length));
+    setInterval(() => moveToSlide((currentIndex + 1) % slides.length), 5000);
+}
+
+// Lightbox
+function openLightbox(url) {
+    const lb = document.getElementById('lightbox');
+    const img = document.getElementById('lightboxImg');
+    if (img && lb) {
+        img.src = url;
+        lb.classList.add('active');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const closeLightbox = document.querySelector('.close-lightbox');
+    if(closeLightbox) {
+        closeLightbox.addEventListener('click', () => {
+            const lb = document.getElementById('lightbox');
+            if (lb) lb.classList.remove('active');
+        });
+    }
+});
