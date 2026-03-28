@@ -11,6 +11,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }, revealOptions);
     document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
+    // FAQ Toggle
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        if (question) {
+            question.addEventListener('click', () => {
+                faqItems.forEach(faq => {
+                    if (faq !== item) faq.classList.remove('active');
+                });
+                item.classList.toggle('active');
+            });
+        }
+    });
+
     // Sticky Header
     const header = document.querySelector('.header');
     window.addEventListener('scroll', () => {
@@ -254,8 +268,172 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Typhidot", price: "1000", time: "Same Day" },
         { name: "Dengue NS1 Antigen", price: "1500", time: "Same Day" },
         { name: "Malaria Parasite (MP)", price: "300", time: "Same Day" },
-        { name: "Serum Electrolytes", price: "1000", time: "Same Day" }
+        { name: "Serum Electrolytes", price: "1000", time: "Same Day" },
+        { name: "25-Hydroxy Vitamin-D", price: "3100", time: "24 Hours" },
+        { name: "75g Glucose Single format (GTT)", price: "1200", time: "Same Day" },
+        { name: "Albumin (Serum)", price: "400", time: "Same Day" },
+        { name: "Alkaline Phosphatase (ALP)", price: "300", time: "Same Day" },
+        { name: "Alpha Fetoprotein (AFP)", price: "1500", time: "Same Day" },
+        { name: "AMH", price: "6000", time: "24 Hours" },
+        { name: "Amylase Serum", price: "1400", time: "Same Day" },
+        { name: "ANA (ELISA)", price: "3000", time: "24 Hours" },
+        { name: "Angiotensin Converting Enzyme", price: "5000", time: "24 Hours" },
+        { name: "Anti Cyclic Citrullinated Peptide", price: "2200", time: "24 Hours" },
+        { name: "Anti-ds DNA", price: "3000", time: "24 Hours" },
+        { name: "Anti Erythropoietin Proteins", price: "4000", time: "24 Hours" },
+        { name: "Anti HBe (HBeAb)", price: "3000", time: "24 Hours" },
+        { name: "Anti HIV 1&2 ELISA", price: "2200", time: "Same Day" },
+        { name: "Anti Nuclear Antibodies (ANA)", price: "7500", time: "24 Hours" },
+        { name: "Anti Tissue Transglutaminase lgA", price: "3000", time: "24 Hours" },
+        { name: "Anti Tissue Transglutaminase lgG", price: "3000", time: "24 Hours" },
+        { name: "Beta HCG", price: "1200", time: "Same Day" },
+        { name: "Bicarbonate (HCO3)", price: "800", time: "Same Day" },
+        { name: "Bilirubin Direct", price: "500", time: "Same Day" },
+        { name: "Bilirubin (Direct/Indirect)", price: "800", time: "Same Day" },
+        { name: "Bilirubin Indirect", price: "500", time: "Same Day" },
+        { name: "BIOPSY LARGE", price: "3000", time: "3 Days" },
+        { name: "BIOPSY MEDIUM FOR HP", price: "2000", time: "3 Days" },
+        { name: "Blood Culture", price: "2000", time: "3 Days" },
+        { name: "Blood Glucose After Lunch", price: "300", time: "Same Day" },
+        { name: "Blood Glucose Before Dinner", price: "300", time: "Same Day" },
+        { name: "Blood Glucose (sugar) Fasting", price: "300", time: "Same Day" },
+        { name: "Blood Glucose (sugar) Rando", price: "300", time: "Same Day" },
+        { name: "Blood Group & RH Factor", price: "300", time: "Same Day" },
+        { name: "Blood Urea Nitrogen (BUN)", price: "400", time: "Same Day" },
+        { name: "Breast Milk for C/S", price: "400", time: "Same Day" },
+        { name: "Brucella Antibody", price: "3000", time: "Same Day" },
+        { name: "C3 & C4 Level", price: "5000", time: "24 Hours" },
+        { name: "CA-125", price: "4000", time: "24 Hours" },
+        { name: "CA 15-3", price: "4500", time: "24 Hours" },
+        { name: "Calcium Serum", price: "300", time: "Same Day" },
+        { name: "Carcinoembryonic Antigen CEA", price: "2200", time: "24 Hours" },
+        { name: "Cardiac Enzymes", price: "2500", time: "Same Day" },
+        { name: "CBC FOR DENGUE", price: "500", time: "Same Day" },
+        { name: "CBC with PERIPHERAL FILM (MP)", price: "2000", time: "Same Day" },
+        { name: "Ceruloplasmin Serum", price: "2200", time: "24 Hours" },
+        { name: "Chloride (Serum)", price: "400", time: "Same Day" },
+        { name: "Cholesterol", price: "400", time: "Same Day" },
+        { name: "CK-MB", price: "1200", time: "Same Day" },
+        { name: "Clotting Time", price: "800", time: "Same Day" },
+        { name: "Coombs Direct", price: "1500", time: "Same Day" },
+        { name: "Coombs Direct/Indirect (Both)", price: "2500", time: "Same Day" },
+        { name: "Copper", price: "2000", time: "24 Hours" },
+        { name: "CORTISOL AM MORNING", price: "2800", time: "24 Hours" },
+        { name: "Cortisol (Serum)", price: "2800", time: "24 Hours" },
+        { name: "CPK MB", price: "800", time: "Same Day" },
+        { name: "C-Peptide Level", price: "5000", time: "24 Hours" },
+        { name: "C-Reactive Protein (CRP)", price: "1300", time: "Same Day" },
+        { name: "Creatinine Serum", price: "400", time: "Same Day" },
+        { name: "CSF Complete Examination", price: "1200", time: "Same Day" },
+        { name: "CSF LDH", price: "800", time: "Same Day" },
+        { name: "D-Dimer Test", price: "3000", time: "Same Day" },
+        { name: "Dehydroepiandrosterone Sulphate", price: "2200", time: "24 Hours" },
+        { name: "Dengue IgG IgM", price: "800", time: "Same Day" },
+        { name: "DIALYSIS PROFILE", price: "10000", time: "24 Hours" },
+        { name: "Electrolytes (Na, Cl)", price: "1400", time: "Same Day" },
+        { name: "ENA PROFILE", price: "8200", time: "24 Hours" },
+        { name: "Erythrocyte sedimentation rate", price: "400", time: "Same Day" },
+        { name: "Estradiol / Serum (E2)", price: "1800", time: "24 Hours" },
+        { name: "Ferritin Level", price: "1200", time: "24 Hours" },
+        { name: "DOPPLER ULTRASOUND", price: "5000", time: "Same Day" },
+        { name: "Fluid Complete Examination ()", price: "5000", time: "Same Day" },
+        { name: "FNAC (FINE NEEDLE ASPIRATION)", price: "4000", time: "Same Day" },
+        { name: "Folate Level (Folic Acid)", price: "4500", time: "24 Hours" },
+        { name: "[Free] (FT3, FT4, TSH) THYROID", price: "4500", time: "24 Hours" },
+        { name: "Free T-3 (Free Tri-iodothyron)", price: "1000", time: "24 Hours" },
+        { name: "Free T-4 (Free Thyroxine)", price: "1000", time: "24 Hours" },
+        { name: "FSH", price: "2000", time: "24 Hours" },
+        { name: "GGT", price: "400", time: "Same Day" },
+        { name: "Growth Hormone (GH)", price: "2800", time: "24 Hours" },
+        { name: "HAV lgM", price: "2000", time: "Same Day" },
+        { name: "HbA1C (Glycosylated Hemoglob)", price: "1100", time: "Same Day" },
+        { name: "Hb Electrophoresis", price: "2500", time: "24 Hours" },
+        { name: "Hb (Hemoglobin)", price: "200", time: "Same Day" },
+        { name: "HBsAb (Hepatitis B Surface Anti)", price: "5000", time: "Same Day" },
+        { name: "HCV RNA PCR Quantitative", price: "12000", time: "3 Days" },
+        { name: "HEV lgM", price: "2000", time: "Same Day" },
+        { name: "HEV lgG", price: "2000", time: "Same Day" },
+        { name: "Helicobacter Pylori lgM", price: "3000", time: "Same Day" },
+        { name: "Helicobacter Pylori lgG", price: "3000", time: "Same Day" },
+        { name: "Hepatitis A Virus lgM (HAV lgM)", price: "3000", time: "Same Day" },
+        { name: "Hepatitis B Core Antibody(HBcAr)", price: "6000", time: "24 Hours" },
+        { name: "Hepatitis B e Antigen (HBeAg)", price: "5000", time: "Same Day" },
+        { name: "Hepatitis B Surface Antigen (HBs)", price: "2000", time: "Same Day" },
+        { name: "Hepatitis C Virus (HCV) RNA QUA", price: "12000", time: "3 Days" },
+        { name: "Hepatitis C Virus (HCV) lgG lgM", price: "1500", time: "Same Day" },
+        { name: "Hepatitis E Virus (HEV) IgM", price: "2500", time: "Same Day" },
+        { name: "Hepatitis E Virus lgG (HEV)", price: "2500", time: "Same Day" },
+        { name: "HIV 1 RNA PCR QUANTITATIVE", price: "19000", time: "3 Days" },
+        { name: "HIV SCREENING ICT", price: "500", time: "Same Day" },
+        { name: "Homocysteine Level", price: "5500", time: "24 Hours" },
+        { name: "HSV lgG Antibody", price: "2200", time: "Same Day" },
+        { name: "HVS Culture", price: "1100", time: "3 Days" },
+        { name: "IgE", price: "1200", time: "24 Hours" },
+        { name: "IMMUNOGLOBULIN IGM (HBcAb)", price: "2500", time: "24 Hours" },
+        { name: "IRON BINDING CAPACITY", price: "1200", time: "Same Day" },
+        { name: "LFTs (Liver Function Test)", price: "1400", time: "Same Day" },
+        { name: "Lipase", price: "2400", time: "Same Day" },
+        { name: "Lipid Profile", price: "1800", time: "Same Day" },
+        { name: "Magnesium Serum", price: "700", time: "Same Day" },
+        { name: "Malaria Parasite (ICT) MP", price: "700", time: "Same Day" },
+        { name: "Malaria Parasite MP Slide", price: "400", time: "Same Day" },
+        { name: "Phosphorus Serum", price: "400", time: "Same Day" },
+        { name: "Platelet Count", price: "400", time: "Same Day" },
+        { name: "PLEURAL FLUID R/E", price: "2000", time: "Same Day" },
+        { name: "Potassium (Serum)", price: "400", time: "Same Day" },
+        { name: "Pregnancy Test", price: "400", time: "Same Day" },
+        { name: "Prolactin Serum", price: "1500", time: "24 Hours" },
+        { name: "Prostate Specific Antigen (PSA)", price: "2200", time: "24 Hours" },
+        { name: "PROTEIN ELECTROPHORESIS", price: "8200", time: "3 Days" },
+        { name: "PT with INR (Prothrombin Time)", price: "700", time: "Same Day" },
+        { name: "Pus Culture", price: "1200", time: "3 Days" },
+        { name: "QuantiFERON TB (IGRA) GOLD", price: "10000", time: "3 Days" },
+        { name: "RA Factor (Qualitative)", price: "1600", time: "Same Day" },
+        { name: "RFTs (Renal Function Tests) Ex", price: "1200", time: "Same Day" },
+        { name: "Rubella IgG/IgM", price: "2200", time: "Same Day" },
+        { name: "Semen Analysis", price: "1000", time: "Same Day" },
+        { name: "Semen Culture Report", price: "1200", time: "3 Days" },
+        { name: "SERUM ANA", price: "2200", time: "24 Hours" },
+        { name: "Serum Insulin", price: "2500", time: "24 Hours" },
+        { name: "SERUM P-ANCA", price: "4500", time: "24 Hours" },
+        { name: "SGOT (AST)", price: "500", time: "Same Day" },
+        { name: "SGPT (ALT)", price: "500", time: "Same Day" },
+        { name: "SPUTUM FOR AFB", price: "2000", time: "3 Days" },
+        { name: "Stone Analysis", price: "2500", time: "3 Days" },
+        { name: "Stool Complete Examination", price: "700", time: "Same Day" },
+        { name: "Stool Culture", price: "1500", time: "3 Days" },
+        { name: "Stool for H.Pylori Antigen", price: "1100", time: "Same Day" },
+        { name: "Stool for Occult Blood", price: "1200", time: "Same Day" },
+        { name: "T3 (Tri-Iodothyronine)", price: "1500", time: "24 Hours" },
+        { name: "T4 (Thyroxine)", price: "1500", time: "24 Hours" },
+        { name: "Testosterone", price: "1500", time: "24 Hours" },
+        { name: "Thyroid Function Test (TFT) (T3,", price: "4000", time: "24 Hours" },
+        { name: "Total Bilirubin", price: "400", time: "Same Day" },
+        { name: "Treponema Pallidum Hemagg", price: "4000", time: "24 Hours" },
+        { name: "Triglycerides TG (Serum)", price: "400", time: "Same Day" },
+        { name: "Trop-I", price: "2200", time: "Same Day" },
+        { name: "TSH (Thyroid Stimulating Horm)", price: "1400", time: "24 Hours" },
+        { name: "UREA (Serum)", price: "400", time: "Same Day" },
+        { name: "Uric acid(UA)", price: "400", time: "Same Day" },
+        { name: "URINE C/E", price: "1000", time: "Same Day" },
+        { name: "USG ABDOMEN", price: "1500", time: "Same Day" },
+        { name: "VDRL", price: "1200", time: "Same Day" },
+        { name: "Vitamin B-12", price: "5000", time: "24 Hours" }
     ];
+
+    const pkgSelect = document.getElementById('pkgSelect');
+    if (pkgSelect) {
+        const optGroup = document.createElement('optgroup');
+        optGroup.label = "Individual Tests";
+        testDatabase.forEach((test, idx) => {
+            // Append all to dropdown so user can pick
+            const opt = document.createElement('option');
+            opt.value = test.name;
+            opt.textContent = `${test.name} (Rs. ${test.price})`;
+            optGroup.appendChild(opt);
+        });
+        pkgSelect.appendChild(optGroup);
+    }
 
     if (testSearchInput && testResults) {
         testSearchInput.addEventListener('input', (e) => {
@@ -350,7 +528,15 @@ function initTestimonialSlider() {
     const nextBtn = document.querySelector('.next-btn');
     const prevBtn = document.querySelector('.prev-btn');
 
-    if (!track || slides.length <= 1) return;
+    if (!track || slides.length === 0) return;
+
+    if (slides.length <= 1) {
+        if (nextBtn) nextBtn.style.display = 'none';
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (dotsNav) dotsNav.style.display = 'none';
+        track.style.justifyContent = 'center';
+        return;
+    }
 
     let currentIndex = 0;
     if (dotsNav) {
