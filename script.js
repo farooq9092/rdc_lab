@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = mobileNav.classList.contains('open') ? 'hidden' : 'auto';
     };
 
-    if(menuToggle && mobileNav) {
+    if (menuToggle && mobileNav) {
         menuToggle.addEventListener('click', toggleMenu);
         overlay.addEventListener('click', toggleMenu);
         document.querySelectorAll('.mobile-nav-links a').forEach(link => {
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const res = await fetch('api/feedback.php?action=submit', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, comment, rating })
                 });
                 if (res.ok) {
@@ -112,8 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     alert("Error submitting feedback. Please try again.");
                 }
-            } catch (err) { 
-                alert("Submission failed. Check your connection."); 
+            } catch (err) {
+                alert("Submission failed. Check your connection.");
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Portal Modal Logic
     const portalModal = document.getElementById('patientPortal');
-    
+
     // Auto-identify triggers by text as fallback
     document.querySelectorAll('.btn').forEach(btn => {
         if (btn.innerText.includes('Download') || btn.innerText.includes('Report')) {
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    if(portalModal) {
+    if (portalModal) {
         const closeBtn = portalModal.querySelector('.close');
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let data = {};
                 try {
                     data = JSON.parse(text);
-                } catch(e) {
+                } catch (e) {
                     alert("SERVER ERROR: " + text.substring(0, 50));
                     throw new Error("Invalid response");
                 }
@@ -192,9 +192,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <p style="margin-bottom:15px; font-weight:600">Status: <span style="background:${data.status === 'Final' ? '#d4edda' : '#fff3cd'}; padding:4px 10px; border-radius:12px; font-size:0.8rem">${data.status}</span></p>
                     
-                    ${data.status === 'Final' ? 
-                      `<a href="api/reports.php?action=download&case_id=${encodeURIComponent(caseId)}&cnic=${encodeURIComponent(password)}" class="btn btn-primary" style="display:block; text-align:center; padding:15px;"><i class="fas fa-download"></i> DOWNLOAD OFFICIAL REPORT</a>` :
-                      `<div style="background:#f8f9fa; padding:15px; border-radius:8px; border-left:4px solid #f1c40f; color:#856404; font-size:0.85rem;"><strong>Processing:</strong> Your results are not finalized yet. Please check back later.</div>`}
+                    ${data.status === 'Final' ?
+                        `<a href="api/reports.php?action=download&case_id=${encodeURIComponent(caseId)}&cnic=${encodeURIComponent(password)}" class="btn btn-primary" style="display:block; text-align:center; padding:15px;"><i class="fas fa-download"></i> DOWNLOAD OFFICIAL REPORT</a>` :
+                        `<div style="background:#f8f9fa; padding:15px; border-radius:8px; border-left:4px solid #f1c40f; color:#856404; font-size:0.85rem;"><strong>Processing:</strong> Your results are not finalized yet. Please check back later.</div>`}
 
                     <button class="btn" onclick="location.reload()" style="margin-top:20px; width:100%; height:45px; background:#f0f0f0; color:#333; border:none; border-radius:8px; cursor:pointer; font-weight:600;">NEW SEARCH</button>
                 `;
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const res = await fetch('api/bookings.php?action=submit', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, phone, package: packageValue, address })
                 });
                 if (res.ok) {
@@ -238,8 +238,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert("Error submitting booking. Please try again.");
                 }
             } catch (err) { alert("Network error. Please call us directly."); }
-            finally { 
-                btn.disabled = false; 
+            finally {
+                btn.disabled = false;
                 btn.innerHTML = 'Request Sample Collection';
             }
         });
@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Copper", price: "4000", time: "24 Hours" },
         { name: "CORTISOL AM MORNING", price: "2500", time: "24 Hours" },
         { name: "Cortisol (Serum)", price: "2500", time: "24 Hours" },
-       { name: "C-Peptide Level", price: "5000", time: "24 Hours" },
+        { name: "C-Peptide Level", price: "5000", time: "24 Hours" },
         { name: "C-Reactive Protein (CRP)", price: "1800", time: "Same Day" },
         { name: "Creatinine Serum", price: "600", time: "Same Day" },
         { name: "CSF Complete Examination", price: "2500", time: "Same Day" },
@@ -354,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Hepatitis A Virus lgM (HAV lgM)", price: "3000", time: "Same Day" },
         { name: "Hepatitis B Core Antibody(HBcAr)", price: "3000", time: "24 Hours" },
         { name: "Hepatitis B e Antigen (HBeAg)", price: "3000", time: "Same Day" },
-        { name: "Hepatitis B Surface Antigen (HBs)", price: "3000", time: "Same Day" }
+        { name: "Hepatitis B Surface Antigen (HBs)", price: "3000", time: "Same Day" },
         { name: "Hepatitis E Virus (HEV) IgM", price: "3000", time: "Same Day" },
         { name: "Hepatitis E Virus lgG (HEV)", price: "3000", time: "Same Day" },
         { name: "HIV 1 RNA PCR QUANTITATIVE", price: "8000", time: "3 Days" },
@@ -406,7 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "TSH (Thyroid Stimulating Horm)", price: "1600", time: "24 Hours" },
         { name: "UREA (Serum)", price: "600", time: "Same Day" },
         { name: "Uric acid(UA)", price: "600", time: "Same Day" },
-        { name: "URINE C/E", price: "400", time: "Same Day" },
+        { name: "URINE C/S", price: "2200", time: "Same Day" },
         { name: "USG ABDOMEN", price: "1500", time: "Same Day" },
         { name: "VDRL", price: "1000", time: "Same Day" },
         { name: "Vitamin B-12", price: "3000", time: "24 Hours" }
@@ -435,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const filtered = testDatabase.filter(t => t.name.toLowerCase().includes(query));
-            
+
             if (filtered.length === 0) {
                 testResults.innerHTML = '<div class="mock-result-text" style="color:#e74c3c">No tests found matching your search. Please call us for details.</div>';
                 return;
@@ -497,7 +497,7 @@ async function loadPublicFeedback() {
         }
         grid.innerHTML = approved.map(f => `
             <div class="testimonial-card">
-                <div class="stars">${'★'.repeat(f.rating)}${'☆'.repeat(5-f.rating)}</div>
+                <div class="stars">${'★'.repeat(f.rating)}${'☆'.repeat(5 - f.rating)}</div>
                 <p>"${f.comment}"</p>
                 <div class="client-info">
                     <span class="client-name">${f.name}</span>
@@ -505,7 +505,7 @@ async function loadPublicFeedback() {
                 </div>
             </div>
         `).join('');
-        
+
         initTestimonialSlider();
     } catch (err) {
         console.error("Feedback load failed");
@@ -568,7 +568,7 @@ function openLightbox(url) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const closeLightbox = document.querySelector('.close-lightbox');
-    if(closeLightbox) {
+    if (closeLightbox) {
         closeLightbox.addEventListener('click', () => {
             const lb = document.getElementById('lightbox');
             if (lb) lb.classList.remove('active');
